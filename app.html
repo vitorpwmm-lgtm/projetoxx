@@ -266,7 +266,7 @@ function renderHome(){
 
 
 function renderDonate(id){
-  if(!user){
+  if(!usuario){
     alert("Você precisa estar logado para doar.");
     return;
   }
@@ -479,7 +479,7 @@ function renderTransparency(){
 }
 
 function renderProfile(){
-  if(!user){
+  if(!usuario){
     alert("Você precisa estar logado.");
     return;
   }
@@ -784,6 +784,41 @@ function renderAdmin(){
   }
 }
 
+
+// === RELATÓRIO DE TRANSPARÊNCIA (ADIÇÃO ÚNICA) ===
+function renderTransparency(){
+  const screen = document.getElementById("screen");
+  screen.innerHTML = `
+    <div class="card">
+      <h3>Transparência</h3>
+
+      <strong>Alimentação – 25%</strong>
+      <div class="progress">
+        <div class="progress-fill" style="width:25%"></div>
+      </div>
+
+      <strong style="display:block;margin-top:12px">Remédios e Exames – 25%</strong>
+      <div class="progress">
+        <div class="progress-fill" style="width:25%"></div>
+      </div>
+
+      <strong style="display:block;margin-top:12px">Consertos na Casa – 25%</strong>
+      <div class="progress">
+        <div class="progress-fill" style="width:25%"></div>
+      </div>
+
+      <strong style="display:block;margin-top:12px">Materiais Escolares – 25%</strong>
+      <div class="progress">
+        <div class="progress-fill" style="width:25%"></div>
+      </div>
+
+      <p style="font-size:13px;color:#555;margin-top:12px">
+        Relatório de transparência mostrando como cada doação é distribuída.
+      </p>
+    </div>
+  `;
+}
+
 </script>
 
 
@@ -911,6 +946,41 @@ renderProfile = function(){
   screen.appendChild(btn);
 };
 
+
+// === RELATÓRIO DE TRANSPARÊNCIA (ADIÇÃO ÚNICA) ===
+function renderTransparency(){
+  const screen = document.getElementById("screen");
+  screen.innerHTML = `
+    <div class="card">
+      <h3>Transparência</h3>
+
+      <strong>Alimentação – 25%</strong>
+      <div class="progress">
+        <div class="progress-fill" style="width:25%"></div>
+      </div>
+
+      <strong style="display:block;margin-top:12px">Remédios e Exames – 25%</strong>
+      <div class="progress">
+        <div class="progress-fill" style="width:25%"></div>
+      </div>
+
+      <strong style="display:block;margin-top:12px">Consertos na Casa – 25%</strong>
+      <div class="progress">
+        <div class="progress-fill" style="width:25%"></div>
+      </div>
+
+      <strong style="display:block;margin-top:12px">Materiais Escolares – 25%</strong>
+      <div class="progress">
+        <div class="progress-fill" style="width:25%"></div>
+      </div>
+
+      <p style="font-size:13px;color:#555;margin-top:12px">
+        Relatório de transparência mostrando como cada doação é distribuída.
+      </p>
+    </div>
+  `;
+}
+
 </script>
 
 
@@ -932,6 +1002,41 @@ function handleAuth(){
     window.location.href = "index.html";
   }
 }
+
+// === RELATÓRIO DE TRANSPARÊNCIA (ADIÇÃO ÚNICA) ===
+function renderTransparency(){
+  const screen = document.getElementById("screen");
+  screen.innerHTML = `
+    <div class="card">
+      <h3>Transparência</h3>
+
+      <strong>Alimentação – 25%</strong>
+      <div class="progress">
+        <div class="progress-fill" style="width:25%"></div>
+      </div>
+
+      <strong style="display:block;margin-top:12px">Remédios e Exames – 25%</strong>
+      <div class="progress">
+        <div class="progress-fill" style="width:25%"></div>
+      </div>
+
+      <strong style="display:block;margin-top:12px">Consertos na Casa – 25%</strong>
+      <div class="progress">
+        <div class="progress-fill" style="width:25%"></div>
+      </div>
+
+      <strong style="display:block;margin-top:12px">Materiais Escolares – 25%</strong>
+      <div class="progress">
+        <div class="progress-fill" style="width:25%"></div>
+      </div>
+
+      <p style="font-size:13px;color:#555;margin-top:12px">
+        Relatório de transparência mostrando como cada doação é distribuída.
+      </p>
+    </div>
+  `;
+}
+
 </script>
 
 </body>
