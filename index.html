@@ -5,10 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Zoê - Login</title>
 
+<link href="https://fonts.googleapis.com/css2?family=Arsenal:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
 <style>
 body{
   margin:0;
-  font-family:Arial,Helvetica,sans-serif;
+  font-family:'Space Mono', monospace;
   background:#e5e7eb;
   display:flex;
   justify-content:center;
@@ -20,8 +22,19 @@ body{
   background:#ffffff;
   padding:24px;
 }
-h1{margin-top:0;text-align:center}
-p{color:#555;text-align:center}
+h1{
+  margin-top:0;
+  text-align:center;
+  font-family:'Arsenal', sans-serif;
+  font-weight:700;
+  letter-spacing:1px;
+}
+p{
+  color:#555;
+  text-align:center;
+  font-size:14px;
+  line-height:1.6;
+}
 .tabs{
   display:flex;
   gap:8px;
@@ -34,6 +47,7 @@ p{color:#555;text-align:center}
   border:1px solid #ddd;
   background:#eee;
   cursor:pointer;
+  font-family:'Space Mono', monospace;
 }
 .tab.active{
   background:#22c55e;
@@ -46,6 +60,7 @@ input{
   border-radius:10px;
   border:1px solid #ddd;
   margin-bottom:10px;
+  font-family:'Space Mono', monospace;
 }
 .btn{
   width:100%;
@@ -56,6 +71,8 @@ input{
   color:#fff;
   font-size:16px;
   cursor:pointer;
+  font-family:'Space Mono', monospace;
+  font-weight:700;
 }
 .btn.secondary{
   background:#e5e7eb;
@@ -70,9 +87,10 @@ input{
   display:inline-block;
 }
 .logo{
-  width:160px;
+  width:260px;
+  max-width:90%;
   display:block;
-  margin:16px auto;
+  margin:20px auto;
 }
 </style>
 </head>
@@ -84,12 +102,12 @@ input{
 <div id="login">
   <h1>Olá, bem-vindo(a) ao Zoê!</h1>
 
-  <img class="logo" src="logo.png" alt="Zoê: A vida em nós" style="width:220px;">
+  <img class="logo" src="logo.png" alt="Zoê: A vida em nós">
 
+  <p>Apadrinhe famílias no Marajó e ajude a transformar vidas!</p>
 
-  <p>Onde a vida floresce!</p>
+  <h3 style="text-align:center;font-family:'Arsenal',sans-serif;">Entrar no Zoê</h3>
 
-  <h3>Entrar no Zoê</h3>
   <div class="tabs">
     <button class="tab active" onclick="setTab(this)">Família</button>
     <button class="tab" onclick="setTab(this)">Padrinho</button>
@@ -105,7 +123,7 @@ input{
 
 <div id="cadastro" class="hidden">
   <span class="back" onclick="voltarLogin()">← Voltar</span>
-  <h3>Criar conta</h3>
+  <h3 style="font-family:'Arsenal',sans-serif;">Criar conta</h3>
 
   <input placeholder="Nome completo">
   <input placeholder="Email">
