@@ -142,6 +142,56 @@ main{
 .dark .nav div {
   color:white !important;
 }
+/* ===== PATCH MENU ⋮ (SEGURO) ===== */
+#menuBtn{
+  margin-left:8px;
+}
+
+/* reaproveita a nav existente */
+.nav{
+  position:absolute !important;
+  top:64px !important;
+  right:16px !important;
+  bottom:auto !important;
+
+  width:auto !important;
+  min-width:180px;
+  flex-direction:column;
+  border-radius:12px;
+  box-shadow:0 12px 30px rgba(0,0,0,.25);
+
+  display:none;      /* começa fechada */
+  z-index:9999;
+}
+
+.nav div{
+  padding:14px 16px;
+}
+
+/* ===== MENU DE NAVEGAÇÃO CONTROLADO PELO ⋮ ===== */
+.nav{
+  position: absolute !important;
+  top: 64px !important;     /* logo abaixo do header */
+  right: 16px !important;
+  bottom: auto !important;
+
+  display: none;            /* começa fechado */
+  flex-direction: column;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(0,0,0,.25);
+  min-width: 180px;
+  z-index: 9999;
+}
+
+.nav div{
+  padding: 14px 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.nav div:last-child{
+  border-bottom: none;
+}
 
 </style>
 </head>
@@ -153,6 +203,7 @@ main{
 <header>
   <span>Zoê</span>
   <button id="authBtn" onclick="handleAuth()">Entrar</button>
+  <button id="menuBtn" onclick="toggleMenu()">⋮</button>
 </header>
 
 <main id="screen"></main>
@@ -161,7 +212,7 @@ main{
   <div onclick="renderHome()">Início</div>
   <div onclick="renderDonations()">Doações</div>
   <div onclick="renderTransparency()">Transparência</div>
-  <div onclick="renderProfile()">Perfil</div><div onclick="renderAdmin()">Admin</div>
+  <div onclick="renderAdmin()">Admin</div>
 </div>
 
 <div id="authOverlay"></div>
@@ -479,7 +530,7 @@ function renderTransparency(){
 }
 
 function renderProfile(){
-  if(!usuario){
+  if(!user){
     alert("Você precisa estar logado.");
     return;
   }
@@ -981,6 +1032,19 @@ function renderTransparency(){
   `;
 }
 
+function toggleMenu(){
+  const nav = document.querySelector('.nav');
+  if(!nav) return;
+
+  nav.style.display =
+    nav.style.display === 'flex' ? 'none' : 'flex';
+}
+document.querySelectorAll('.nav div').forEach(item=>{
+  item.addEventListener('click', ()=>{
+    document.querySelector('.nav').style.display = 'none';
+  });
+});
+
 </script>
 
 
@@ -1036,6 +1100,14 @@ function renderTransparency(){
     </div>
   `;
 }
+function toggleMenu(){
+  const nav = document.querySelector('.nav');
+  if(!nav) return;
+
+  nav.style.display =
+    nav.style.display === 'flex' ? 'none' : 'flex';
+}
+console.log("SCRIPT DO APP CARREGOU");
 
 </script>
 
