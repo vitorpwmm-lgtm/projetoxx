@@ -8,6 +8,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Arsenal:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
+/* ===== CORREÇÃO DE ALINHAMENTO ===== */
+*{
+  box-sizing: border-box;
+}
+
 body{
   margin:0;
   font-family:'Space Mono', monospace;
@@ -62,6 +67,10 @@ input{
   margin-bottom:10px;
   font-family:'Space Mono', monospace;
 }
+input:focus{
+  outline:none;
+  border-color:#22c55e;
+}
 .btn{
   width:100%;
   padding:14px;
@@ -92,6 +101,13 @@ input{
   display:block;
   margin:20px auto;
 }
+.section-title{
+  margin:18px 0 10px;
+  font-family:'Arsenal', sans-serif;
+  font-size:18px;
+  font-weight:700;
+  color:#111;
+}
 </style>
 </head>
 
@@ -99,6 +115,7 @@ input{
 
 <div class="phone">
 
+<!-- LOGIN -->
 <div id="login">
   <h1>Olá, bem-vindo(a) ao Zoê!</h1>
 
@@ -108,12 +125,6 @@ input{
 
   <h3 style="text-align:center;font-family:'Arsenal',sans-serif;">Entrar no Zoê</h3>
 
-  <div class="tabs">
-    <button class="tab active" onclick="setTab(this)">Família</button>
-    <button class="tab" onclick="setTab(this)">Padrinho</button>
-    <button class="tab" onclick="setTab(this)">Instituição</button>
-  </div>
-
   <input placeholder="Email">
   <input type="password" placeholder="Senha">
 
@@ -121,12 +132,31 @@ input{
   <button class="btn secondary" onclick="abrirCadastro()">Criar conta</button>
 </div>
 
+<!-- CADASTRO -->
 <div id="cadastro" class="hidden">
   <span class="back" onclick="voltarLogin()">← Voltar</span>
   <h3 style="font-family:'Arsenal',sans-serif;">Criar conta</h3>
 
+  <!-- TIPO DE CADASTRO -->
+  <div class="tabs">
+    <button class="tab active" onclick="setTab(this)">Família</button>
+    <button class="tab" onclick="setTab(this)">Padrinho</button>
+    <button class="tab" onclick="setTab(this)">Instituição</button>
+  </div>
+
+  <!-- DADOS PESSOAIS -->
+  <div class="section-title">Dados pessoais</div>
+
   <input placeholder="Nome completo">
+  <input placeholder="RG">
+  <input placeholder="CPF">
+
   <input placeholder="Email">
+  <input placeholder="Telefone">
+
+  <!-- DADOS BANCÁRIOS -->
+  <div class="section-title">Dados bancários</div>
+
   <input type="password" placeholder="Senha">
   <input type="password" placeholder="Confirmar senha">
 
@@ -140,21 +170,33 @@ function setTab(el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
 }
+
 function abrirCadastro(){
   document.getElementById('login').classList.add('hidden');
   document.getElementById('cadastro').classList.remove('hidden');
 }
+
 function voltarLogin(){
   document.getElementById('cadastro').classList.add('hidden');
   document.getElementById('login').classList.remove('hidden');
 }
+
 function finalizarCadastro(){
-  alert("Cadastro realizado com sucesso! Faça login.");
+  const tipo = document.querySelector('#cadastro .tab.active')?.innerText;
+
+  if(!tipo){
+    alert("Escolha o tipo de cadastro");
+    return;
+  }
+
+  localStorage.setItem("tipoCadastro", tipo);
+
+  alert("Cadastro realizado como " + tipo + "! Faça login.");
   voltarLogin();
 }
+
 function entrar(){
   const email = document.querySelector('#login input[placeholder="Email"]').value;
-  const tipo = document.querySelector('.tab.active').innerText;
 
   if(!email){
     alert("Informe o email");
@@ -162,8 +204,7 @@ function entrar(){
   }
 
   localStorage.setItem("usuarioLogado", JSON.stringify({
-    email: email,
-    tipo: tipo
+    email: email
   }));
 
   window.location.href = "app.html";
