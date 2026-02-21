@@ -21,13 +21,32 @@ body{
   max-width:420px;
   min-height:100vh;
   background:#f8fafc;
+  position:relative;
 }
 
 header{
   background:#22c55e;
   color:#fff;
   padding:16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
   font-weight:600;
+}
+
+header .actions{
+  display:flex;
+  gap:8px;
+}
+
+header button{
+  background:#fff;
+  color:#22c55e;
+  border:none;
+  padding:6px 14px;
+  border-radius:18px;
+  font-weight:600;
+  cursor:pointer;
 }
 
 main{ padding:16px; }
@@ -62,6 +81,19 @@ main{ padding:16px; }
 .btn.blue{ background:#2563eb; }
 .btn.gray{ background:#e5e7eb; color:#111; }
 
+.progress{
+  background:#e5e7eb;
+  height:8px;
+  border-radius:8px;
+  overflow:hidden;
+  margin-top:6px;
+}
+
+.progress-fill{
+  background:#22c55e;
+  height:100%;
+}
+
 .value-buttons{
   display:flex;
   gap:8px;
@@ -91,6 +123,27 @@ input{
   border:1px solid #ddd;
   margin-top:8px;
 }
+
+/* MENU */
+.nav{
+  position:absolute;
+  top:60px;
+  right:16px;
+  background:#fff;
+  border-radius:12px;
+  box-shadow:0 10px 30px rgba(0,0,0,.25);
+  display:none;
+  flex-direction:column;
+  min-width:180px;
+  z-index:999;
+}
+
+.nav div{
+  padding:14px 16px;
+  cursor:pointer;
+  border-bottom:1px solid #eee;
+}
+.nav div:last-child{ border-bottom:none; }
 </style>
 </head>
 
@@ -98,14 +151,42 @@ input{
 
 <div class="phone">
 
-<header>Zoê</header>
+<header>
+  <span>Zoê</span>
+  <div class="actions">
+    <button id="authBtn" onclick="handleAuth()">Sair</button>
+    <button onclick="toggleMenu()">☰</button>
+  </div>
+</header>
 
 <main id="screen"></main>
 <div id="paymentScreen" style="display:none;padding:16px;"></div>
 
+<div class="nav" id="menu">
+  <div onclick="renderHome()">Início</div>
+  <div onclick="renderDonations()">Doações</div>
+  <div onclick="renderTransparency()">Transparência</div>
+</div>
+
 </div>
 
 <script>
+// ===== LOGIN =====
+const usuario = JSON.parse(localStorage.getItem("usuarioLogado"));
+if(!usuario){
+  window.location.href = "index.html";
+}
+function handleAuth(){
+  localStorage.removeItem("usuarioLogado");
+  window.location.href = "index.html";
+}
+
+// ===== MENU =====
+function toggleMenu(){
+  const nav = document.getElementById("menu");
+  nav.style.display = nav.style.display === "flex" ? "none" : "flex";
+}
+
 // ===== DADOS =====
 const families = [
   { name:"Família Silva", image:"assets/familia1.jpeg", goal:1800, raised:720 },
@@ -117,11 +198,12 @@ let familiaAtual = "";
 
 // ===== HOME =====
 function renderHome(){
+  document.getElementById("menu").style.display="none";
   const s = document.getElementById("screen");
   const p = document.getElementById("paymentScreen");
 
-  p.style.display = "none";
-  s.style.display = "block";
+  p.style.display="none";
+  s.style.display="block";
 
   s.innerHTML = `
     <div class="card">
@@ -131,8 +213,7 @@ function renderHome(){
   `;
 
   families.forEach(f=>{
-    const percent = Math.min((f.raised / f.goal) * 100, 100);
-
+    const percent = Math.min((f.raised/f.goal)*100,100);
     s.innerHTML += `
       <div class="card">
         <img src="${f.image}">
@@ -147,14 +228,24 @@ function renderHome(){
   });
 }
 
-// ===== ESCOLHA DO PAGAMENTO =====
+function renderDonations(){
+  document.getElementById("menu").style.display="none";
+  document.getElementById("screen").innerHTML =
+    `<div class="card"><h3>Doações</h3><p>Histórico em breve.</p></div>`;
+}
+
+function renderTransparency(){
+  document.getElementById("menu").style.display="none";
+  document.getElementById("screen").innerHTML =
+    `<div class="card"><h3>Transparência</h3><p>Relatório em breve.</p></div>`;
+}
+
+// ===== PAGAMENTO =====
 function abrirPagamento(nome){
   familiaAtual = nome;
-  valorSelecionado = 0;
-
-  document.getElementById("screen").style.display = "none";
+  document.getElementById("screen").style.display="none";
   const p = document.getElementById("paymentScreen");
-  p.style.display = "block";
+  p.style.display="block";
 
   p.innerHTML = `
     <div class="card">
@@ -163,17 +254,16 @@ function abrirPagamento(nome){
 
       <button class="btn green" onclick="abrirPix()">💚 Pix</button>
       <button class="btn blue" onclick="abrirCartao()">💳 Cartão</button>
-
       <button class="btn gray" onclick="renderHome()">← Voltar</button>
     </div>
   `;
 }
 
-// ===== PIX =====
 function abrirPix(){
-  const p = document.getElementById("paymentScreen");
+  const p=document.getElementById("paymentScreen");
+  valorSelecionado=0;
 
-  p.innerHTML = `
+  p.innerHTML=`
     <div class="card">
       <h3>Pagamento via Pix</h3>
       <p><strong>${familiaAtual}</strong></p>
@@ -193,73 +283,54 @@ function abrirPix(){
   `;
 }
 
-function setValor(valor, botao=null){
-  valorSelecionado = Number(valor) || 0;
-
-  const input = document.getElementById("valorInput");
-  if(input) input.value = valorSelecionado || "";
-
-  document.querySelectorAll(".value-buttons button")
-    .forEach(b=>b.classList.remove("active"));
-
+function setValor(valor,botao=null){
+  valorSelecionado=Number(valor)||0;
+  const i=document.getElementById("valorInput");
+  if(i) i.value=valorSelecionado||"";
+  document.querySelectorAll(".value-buttons button").forEach(b=>b.classList.remove("active"));
   if(botao) botao.classList.add("active");
 }
 
 function gerarPix(){
-  if(valorSelecionado <= 0){
-    alert("Informe um valor válido");
-    return;
-  }
-
-  const p = document.getElementById("paymentScreen");
-
-  p.innerHTML = `
+  if(valorSelecionado<=0){ alert("Informe um valor"); return; }
+  const p=document.getElementById("paymentScreen");
+  p.innerHTML=`
     <div class="card" style="text-align:center">
       <h3>PIX</h3>
       <p>Valor: <strong>R$ ${valorSelecionado.toFixed(2)}</strong></p>
-
       <img src="assets/qrcode-pix.png" style="width:220px;margin:12px auto">
-
       <p id="pixCode" style="font-size:12px;word-break:break-all">
         PIX-ZOE-${valorSelecionado}
       </p>
-
-      <button class="btn" onclick="copiarPix()">Copiar código PIX</button>
+      <button class="btn" onclick="copiarPix()">Copiar código</button>
       <button class="btn green" onclick="sucesso()">Já paguei</button>
     </div>
   `;
 }
 
 function copiarPix(){
-  navigator.clipboard.writeText(
-    document.getElementById("pixCode").innerText
-  );
+  navigator.clipboard.writeText(document.getElementById("pixCode").innerText);
   alert("Código PIX copiado");
 }
 
-// ===== CARTÃO =====
 function abrirCartao(){
-  const p = document.getElementById("paymentScreen");
-
-  p.innerHTML = `
+  const p=document.getElementById("paymentScreen");
+  p.innerHTML=`
     <div class="card">
       <h3>Pagamento com Cartão</h3>
       <p><strong>${familiaAtual}</strong></p>
-
       <input placeholder="Nome no cartão">
       <input placeholder="Número do cartão">
-      <input placeholder="Validade (MM/AA)">
+      <input placeholder="Validade">
       <input placeholder="CVV">
-
       <button class="btn blue" onclick="sucesso()">Pagar</button>
       <button class="btn gray" onclick="abrirPagamento(familiaAtual)">← Voltar</button>
     </div>
   `;
 }
 
-// ===== SUCESSO =====
 function sucesso(){
-  document.getElementById("paymentScreen").innerHTML = `
+  document.getElementById("paymentScreen").innerHTML=`
     <div class="card" style="text-align:center">
       <h2>❤️ Obrigado!</h2>
       <p>Doação registrada com sucesso.</p>
