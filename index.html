@@ -3,384 +3,115 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zoê</title>
+<title>Zoê - Login</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Arsenal:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
-*{ box-sizing:border-box; }
+*{ box-sizing:border-box }
 body{
   margin:0;
+  font-family:'Space Mono', monospace;
   background:#e5e7eb;
   display:flex;
   justify-content:center;
-  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
 .phone{
   width:100%;
   max-width:420px;
   min-height:100vh;
-  background:#f8fafc;
-  position:relative;
+  background:#ffffff;
+  padding:24px;
 }
-header{
-  background:#22c55e;
-  color:#fff;
-  padding:16px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  font-weight:600;
+h1{
+  margin-top:0;
+  text-align:center;
+  font-family:'Arsenal', sans-serif;
+  font-weight:700;
 }
-header button{
-  background:#fff;
-  color:#22c55e;
-  border:none;
-  padding:6px 14px;
-  border-radius:18px;
-  font-weight:600;
-}
-main{ padding:16px; }
-.card{
-  background:#fff;
-  border-radius:16px;
-  padding:16px;
-  margin-bottom:16px;
-  box-shadow:0 6px 18px rgba(0,0,0,.08);
-}
-.card img{
-  width:100%;
-  border-radius:12px;
-  margin-bottom:10px;
-}
-.btn{
-  background:#f97316;
-  color:#fff;
-  border:none;
-  padding:12px;
-  width:100%;
-  border-radius:12px;
-  margin-top:10px;
-  cursor:pointer;
-  font-weight:600;
-}
-.btn.green{ background:#22c55e; }
-.btn.blue{ background:#2563eb; }
-.btn.gray{ background:#e5e7eb; color:#111; }
-.progress{
-  background:#e5e7eb;
-  height:8px;
-  border-radius:8px;
-  overflow:hidden;
-  margin-top:6px;
-}
-.progress-fill{
-  background:#22c55e;
-  height:100%;
-}
-.value-buttons{
-  display:flex;
-  gap:8px;
-  margin:10px 0;
-}
-.value-buttons button{
-  flex:1;
-  padding:10px;
-  border-radius:10px;
-  border:2px solid #22c55e;
-  background:#fff;
-  color:#22c55e;
-  font-weight:600;
-}
-.value-buttons button.active{
-  background:#22c55e;
-  color:#fff;
+p{
+  color:#555;
+  text-align:center;
+  font-size:14px;
 }
 input{
   width:100%;
-  padding:10px;
+  padding:12px;
   border-radius:10px;
   border:1px solid #ddd;
-  margin-top:8px;
+  margin-bottom:10px;
+  font-family:'Space Mono', monospace;
 }
-.nav{
-  position:absolute;
-  top:60px;
-  right:16px;
-  background:#fff;
+.btn{
+  width:100%;
+  padding:14px;
+  border:none;
   border-radius:12px;
-  box-shadow:0 10px 30px rgba(0,0,0,.25);
-  display:none;
-  flex-direction:column;
-  min-width:180px;
-  z-index:999;
-}
-.nav div{
-  padding:14px 16px;
+  background:#f97316;
+  color:#fff;
+  font-size:16px;
   cursor:pointer;
-  border-bottom:1px solid #eee;
+  font-weight:700;
 }
-.nav div:last-child{ border-bottom:none; }
+.btn.secondary{
+  background:#e5e7eb;
+  color:#111;
+  margin-top:10px;
+}
+.logo{
+  width:260px;
+  max-width:90%;
+  display:block;
+  margin:20px auto;
+}
+.hidden{ display:none }
 </style>
 </head>
 
 <body>
+
 <div class="phone">
 
-<header>
-  <span>Zoê</span>
-  <button onclick="toggleMenu()">☰</button>
-</header>
+  <h1>Olá, bem-vindo(a) ao Zoê!</h1>
 
-<main id="screen"></main>
-<div id="paymentScreen" style="display:none;padding:16px;"></div>
+  <img class="logo" src="assets/logo.png" alt="Zoê">
 
-<div class="nav" id="menu">
-  <div onclick="renderHome()">Início</div>
-  <div onclick="renderDonations()">Doações</div>
-  <div onclick="renderTransparency()">Transparência</div>
-  <div onclick="renderProfile()">Perfil</div>
-  <div onclick="logout()" style="color:#dc2626;font-weight:600">Sair</div>
+  <p>Onde a vida floresce!</p>
+
+  <!-- LOGIN -->
+  <div id="login">
+    <input id="email" placeholder="Email">
+    <input id="senha" type="password" placeholder="Senha">
+    <button class="btn" onclick="entrar()">Entrar</button>
+  </div>
+
 </div>
 
 <script>
-// ===== LOGIN =====
-const usuario = JSON.parse(localStorage.getItem("usuarioLogado"));
-const tipoCadastro = localStorage.getItem("tipoCadastro");
-if(!usuario) location.href="index.html";
-function logout(){
-  localStorage.removeItem("usuarioLogado");
-  location.href="index.html";
-}
+/*
+  ⚠️ IMPORTANTE
+  - NÃO existe redirect automático
+  - Só entra no app clicando no botão
+  - Isso evita loop no GitHub Pages
+*/
 
-// ===== MENU =====
-function toggleMenu(){
-  const m=document.getElementById("menu");
-  m.style.display=m.style.display==="flex"?"none":"flex";
-}
+function entrar(){
+  const email = document.getElementById("email").value.trim();
 
-// ===== DADOS =====
-const families = [
-  { name:"Família Silva", image:"assets/familia1.jpeg", goal:1800, raised:720 },
-  { name:"Família Pereira", image:"assets/familia2.jpeg", goal:900, raised:300 },
-  { name:"Família Rocha", image:"assets/familia3.jpeg", goal:1500, raised:0 },
-  { name:"Família do Amor", image:"assets/familia4.jpeg", goal:2000, raised:0 },
-  { name:"Família Santos", image:"assets/familia5.jpeg", goal:1200, raised:0 },
-  { name:"Família Ferreira", image:"assets/familia6.jpeg", goal:1800, raised:0 },
-  { name:"Família Nunes", image:"assets/familia7.jpeg", goal:900, raised:0 },
-  { name:"Família Costa", image:"assets/familia8.jpeg", goal:1600, raised:0 },
-  { name:"Família Lima", image:"assets/familia9.jpeg", goal:1400, raised:0 }
-];
-
-// ===== RELATÓRIO =====
-let relatorio = JSON.parse(localStorage.getItem("relatorio")) || [];
-
-function registrarDoacao(forma){
-  relatorio.push({
-    nome: usuario.email.split("@")[0],
-    email: usuario.email,
-    cpf: localStorage.getItem("cpfUsuario") || "Não informado",
-    forma,
-    familia: familiaAtual,
-    valor: valorSelecionado,
-    data: new Date().toLocaleString("pt-BR")
-  });
-  localStorage.setItem("relatorio", JSON.stringify(relatorio));
-}
-
-let familiaAtual="";
-let valorSelecionado=0;
-
-// ===== HOME =====
-function renderHome(){
-  document.getElementById("menu").style.display="none";
-  const s=document.getElementById("screen");
-  const p=document.getElementById("paymentScreen");
-  p.style.display="none";
-  s.style.display="block";
-
-  s.innerHTML=`
-    <div class="card">
-      <h3>Bem-vindo(a)!</h3>
-      <p>Ajude famílias no Marajó através do apadrinhamento.</p>
-    </div>
-  `;
-
-  families.forEach(f=>{
-    const percent=Math.min((f.raised/f.goal)*100,100);
-    s.innerHTML+=`
-      <div class="card">
-        <img src="${f.image}">
-        <strong>${f.name}</strong>
-        <p>R$ ${f.raised} / R$ ${f.goal}</p>
-        <div class="progress">
-          <div class="progress-fill" style="width:${percent}%"></div>
-        </div>
-        <button class="btn" onclick="abrirPagamento('${f.name}')">
-          Apadrinhar
-        </button>
-      </div>
-    `;
-  });
-}
-
-// ===== PERFIL =====
-function renderProfile(){
-  document.getElementById("menu").style.display="none";
-  document.getElementById("screen").innerHTML=`
-    <div class="card">
-      <h3>Meu Perfil</h3>
-      <p><strong>Email:</strong><br>${usuario.email}</p>
-      <p><strong>Tipo de cadastro:</strong><br>${tipoCadastro||"Não informado"}</p>
-      <button class="btn gray" onclick="renderHome()">← Voltar</button>
-    </div>
-  `;
-}
-
-function renderDonations(){
-  document.getElementById("menu").style.display="none";
-  document.getElementById("screen").innerHTML=
-    `<div class="card"><h3>Doações</h3><p>Histórico em breve.</p></div>`;
-}
-
-// ===== TRANSPARÊNCIA =====
-function renderTransparency(){
-  document.getElementById("menu").style.display="none";
-  const s=document.getElementById("screen");
-  const p=document.getElementById("paymentScreen");
-  p.style.display="none";
-  s.style.display="block";
-
-  if(relatorio.length===0){
-    s.innerHTML=`
-      <div class="card">
-        <h3>Transparência</h3>
-        <p>Nenhuma doação registrada.</p>
-      </div>`;
+  if(!email){
+    alert("Informe o email");
     return;
   }
 
-  let html=`<div class="card"><h3>Relatório de Doações</h3></div>`;
-  relatorio.forEach(d=>{
-    html+=`
-      <div class="card" style="font-size:14px">
-        <strong>Doador:</strong> ${d.nome}<br>
-        <strong>Email:</strong> ${d.email}<br>
-        <strong>CPF:</strong> ${d.cpf}<br>
-        <strong>Forma:</strong> ${d.forma}<br>
-        <strong>Família:</strong> ${d.familia}<br>
-        <strong>Valor:</strong> R$ ${Number(d.valor).toFixed(2)}<br>
-        <strong>Data:</strong> ${d.data}
-      </div>`;
-  });
-  s.innerHTML=html;
+  // salva usuário
+  localStorage.setItem("usuarioLogado", JSON.stringify({
+    email: email
+  }));
+
+  // vai para o app SOMENTE aqui
+  window.location.href = "app.html";
 }
-
-// ===== PAGAMENTO =====
-function abrirPagamento(nome){
-  familiaAtual=nome;
-  document.getElementById("screen").style.display="none";
-  const p=document.getElementById("paymentScreen");
-  p.style.display="block";
-
-  p.innerHTML=`
-    <div class="card">
-      <h3>Forma de pagamento</h3>
-      <p><strong>${nome}</strong></p>
-      <button class="btn green" onclick="abrirPix()">💚 Pix</button>
-      <button class="btn blue" onclick="abrirCartao()">💳 Cartão</button>
-      <button class="btn gray" onclick="renderHome()">← Voltar</button>
-    </div>`;
-}
-
-function abrirPix(){
-  valorSelecionado=0;
-  const p=document.getElementById("paymentScreen");
-  p.innerHTML=`
-    <div class="card">
-      <h3>Pagamento via Pix</h3>
-      <p><strong>${familiaAtual}</strong></p>
-
-      <div class="value-buttons">
-        <button onclick="setValor(10,this)">R$ 10</button>
-        <button onclick="setValor(50,this)">R$ 50</button>
-        <button onclick="setValor(100,this)">R$ 100</button>
-      </div>
-
-      <input id="valorInput" type="number"
-        placeholder="Outro valor (R$)"
-        oninput="setValor(this.value)">
-
-      <button class="btn green" onclick="gerarPix()">Fazer pagamento</button>
-      <button class="btn gray" onclick="abrirPagamento(familiaAtual)">← Voltar</button>
-    </div>`;
-}
-
-function setValor(valor,btn=null){
-  valorSelecionado=Number(valor)||0;
-  const i=document.getElementById("valorInput");
-  if(i) i.value=valorSelecionado||"";
-  document.querySelectorAll(".value-buttons button")
-    .forEach(b=>b.classList.remove("active"));
-  if(btn) btn.classList.add("active");
-}
-
-function gerarPix(){
-  if(valorSelecionado<=0){
-    alert("Informe um valor");
-    return;
-  }
-  const p=document.getElementById("paymentScreen");
-  p.innerHTML=`
-    <div class="card" style="text-align:center">
-      <h3>PIX</h3>
-      <p>Valor: <strong>R$ ${valorSelecionado.toFixed(2)}</strong></p>
-      <img src="assets/qrcode-pix.jpg" style="width:220px;margin:12px auto">
-      <p id="pixCode" style="font-size:12px;word-break:break-all">
-        PIX-ZOE-${valorSelecionado}
-      </p>
-      <button class="btn" onclick="copiarPix()">Copiar código</button>
-      <button class="btn green" onclick="registrarDoacao('Pix'); sucesso()">
-        Já paguei
-      </button>
-    </div>`;
-}
-
-function copiarPix(){
-  navigator.clipboard.writeText(
-    document.getElementById("pixCode").innerText
-  );
-  alert("Código PIX copiado");
-}
-
-function abrirCartao(){
-  const p=document.getElementById("paymentScreen");
-  p.innerHTML=`
-    <div class="card">
-      <h3>Pagamento com Cartão</h3>
-      <p><strong>${familiaAtual}</strong></p>
-      <input placeholder="Nome no cartão">
-      <input placeholder="Número do cartão">
-      <input placeholder="Validade">
-      <input placeholder="CVV">
-      <button class="btn blue" onclick="registrarDoacao('Cartão'); sucesso()">
-        Pagar
-      </button>
-      <button class="btn gray" onclick="abrirPagamento(familiaAtual)">← Voltar</button>
-    </div>`;
-}
-
-function sucesso(){
-  document.getElementById("paymentScreen").innerHTML=`
-    <div class="card" style="text-align:center">
-      <h2>❤️ Obrigado!</h2>
-      <p>Doação registrada com sucesso.</p>
-    </div>`;
-  setTimeout(renderHome,3000);
-}
-
-// START
-renderHome();
 </script>
 
-</div>
 </body>
 </html>
