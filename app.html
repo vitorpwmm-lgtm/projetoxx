@@ -143,7 +143,7 @@ input{
 </div>
 
 <script>
-// ===== LOGIN (SEM LOOP) =====
+// ===== LOGIN =====
 const usuario = JSON.parse(localStorage.getItem("usuarioLogado"));
 const tipoCadastro = localStorage.getItem("tipoCadastro");
 
@@ -151,7 +151,7 @@ if(!usuario){
   document.getElementById("screen").innerHTML = `
     <div class="card" style="text-align:center">
       <h3>Acesso restrito</h3>
-      <p>Você precisa fazer login para acessar o Zoê.</p>
+      <p>Você precisa fazer login.</p>
       <button class="btn green" onclick="location.href='index.html'">
         Ir para login
       </button>
@@ -175,22 +175,16 @@ function toggleMenu(){
 const families = [
   { name:"Família Silva", image:"assets/familia1.jpeg", goal:1800, raised:720 },
   { name:"Família Pereira", image:"assets/familia2.jpeg", goal:900, raised:300 },
-  { name:"Família Rocha", image:"assets/familia3.jpeg", goal:1500, raised:0 },
-  { name:"Família do Amor", image:"assets/familia4.jpeg", goal:2000, raised:0 },
-  { name:"Família Santos", image:"assets/familia5.jpeg", goal:1200, raised:0 },
-  { name:"Família Ferreira", image:"assets/familia6.jpeg", goal:1800, raised:0 },
-  { name:"Família Nunes", image:"assets/familia7.jpeg", goal:900, raised:0 },
-  { name:"Família Costa", image:"assets/familia8.jpeg", goal:1600, raised:0 },
-  { name:"Família Lima", image:"assets/familia9.jpeg", goal:1400, raised:0 }
+  { name:"Família Rocha", image:"assets/familia3.jpeg", goal:1500, raised:0 }
 ];
 
 // ===== RELATÓRIO =====
 let relatorio = JSON.parse(localStorage.getItem("relatorio")) || [];
+
 function registrarDoacao(forma){
   relatorio.push({
     nome: usuario.email.split("@")[0],
     email: usuario.email,
-    cpf: localStorage.getItem("cpfUsuario") || "Não informado",
     forma,
     familia: familiaAtual,
     valor: valorSelecionado,
@@ -212,7 +206,7 @@ function renderHome(){
   s.innerHTML=`
     <div class="card">
       <h3>Bem-vindo(a)!</h3>
-      <p>Ajude famílias no Marajó através do apadrinhamento.</p>
+      <p>Ajude famílias através do apadrinhamento.</p>
     </div>
   `;
 
@@ -252,32 +246,35 @@ function renderDonations(){
     `<div class="card"><h3>Doações</h3><p>Histórico em breve.</p></div>`;
 }
 
+// ===== TRANSPARÊNCIA =====
 function renderTransparency(){
   document.getElementById("menu").style.display="none";
   document.getElementById("paymentScreen").style.display="none";
   const s=document.getElementById("screen");
-  s.style.display="block";
 
-  if(relatorio.length===0){
-    s.innerHTML=`<div class="card"><h3>Transparência</h3><p>Nenhuma doação registrada.</p></div>`;
-    return;
-  }
+  s.innerHTML=`
+    <div class="card">
+      <h3>Transparência</h3>
+      <button class="btn green" onclick="abrirSecaoRelatorio()">
+        📊 Seção de relatório
+      </button>
+    </div>
+  `;
+}
 
-  let html=`<div class="card"><h3>Relatório de Doações</h3></div>`;
-  relatorio.forEach(d=>{
-    html+=`
-      <div class="card" style="font-size:14px">
-        <strong>Doador:</strong> ${d.nome}<br>
-        <strong>Email:</strong> ${d.email}<br>
-        <strong>CPF:</strong> ${d.cpf}<br>
-        <strong>Forma:</strong> ${d.forma}<br>
-        <strong>Família:</strong> ${d.familia}<br>
-        <strong>Valor:</strong> R$ ${Number(d.valor).toFixed(2)}<br>
-        <strong>Data:</strong> ${d.data}
-      </div>
-    `;
-  });
-  s.innerHTML=html;
+function abrirSecaoRelatorio(){
+  const s=document.getElementById("screen");
+  s.innerHTML=`
+    <div class="card">
+      <h3>Seção de Relatório</h3>
+      <p>
+        Projeto: Zoê<br>
+        Responsável: Administração<br>
+        Data: ${new Date().toLocaleDateString("pt-BR")}
+      </p>
+      <button class="btn gray" onclick="renderTransparency()">← Voltar</button>
+    </div>
+  `;
 }
 
 // ===== PAGAMENTO =====
@@ -294,16 +291,17 @@ function abrirPagamento(nome){
       <button class="btn green" onclick="abrirPix()">💚 Pix</button>
       <button class="btn blue" onclick="abrirCartao()">💳 Cartão</button>
       <button class="btn gray" onclick="renderHome()">← Voltar</button>
-    </div>`;
+    </div>
+  `;
 }
 
 function abrirPix(){
   valorSelecionado=0;
   const p=document.getElementById("paymentScreen");
+
   p.innerHTML=`
     <div class="card">
       <h3>Pagamento via Pix</h3>
-      <p><strong>${familiaAtual}</strong></p>
 
       <div class="value-buttons">
         <button onclick="setValor(10,this)">R$ 10</button>
@@ -311,13 +309,13 @@ function abrirPix(){
         <button onclick="setValor(100,this)">R$ 100</button>
       </div>
 
-      <input id="valorInput" type="number"
-        placeholder="Outro valor (R$)"
+      <input id="valorInput" type="number" placeholder="Outro valor"
         oninput="setValor(this.value)">
 
       <button class="btn green" onclick="gerarPix()">Fazer pagamento</button>
       <button class="btn gray" onclick="abrirPagamento(familiaAtual)">← Voltar</button>
-    </div>`;
+    </div>
+  `;
 }
 
 function setValor(valor,btn=null){
@@ -330,39 +328,39 @@ function setValor(valor,btn=null){
 }
 
 function gerarPix(){
-  if(valorSelecionado<=0){ alert("Informe um valor"); return; }
+  if(valorSelecionado<=0){
+    alert("Informe um valor");
+    return;
+  }
+
   const p=document.getElementById("paymentScreen");
+
   p.innerHTML=`
     <div class="card" style="text-align:center">
       <h3>PIX</h3>
-      <p>Valor: <strong>R$ ${valorSelecionado.toFixed(2)}</strong></p>
-      <img src="assets/qrcode-pix.jpg" style="width:220px;margin:12px auto">
+      <p><strong>${familiaAtual}</strong></p>
+      <p>Valor: R$ ${valorSelecionado.toFixed(2)}</p>
+
+      <img src="assets/qrcode-pix.jpg"
+           style="width:220px;margin:16px auto">
+
       <p id="pixCode" style="font-size:12px;word-break:break-all">
-        PIX-ZOE-${valorSelecionado}
+        PIX-ZOE-${familiaAtual}-${valorSelecionado}
       </p>
-      <button class="btn" onclick="copiarPix()">Copiar código</button>
-      <button class="btn green" onclick="registrarDoacao('Pix'); sucesso()">Já paguei</button>
-    </div>`;
+
+      <button class="btn" onclick="copiarPix()">Copiar código Pix</button>
+      <button class="btn green" onclick="registrarDoacao('Pix'); sucesso()">
+        Já paguei
+      </button>
+    </div>
+  `;
 }
 
 function copiarPix(){
-  navigator.clipboard.writeText(document.getElementById("pixCode").innerText);
-  alert("Código PIX copiado");
-}
-
-function abrirCartao(){
-  const p=document.getElementById("paymentScreen");
-  p.innerHTML=`
-    <div class="card">
-      <h3>Pagamento com Cartão</h3>
-      <p><strong>${familiaAtual}</strong></p>
-      <input placeholder="Nome no cartão">
-      <input placeholder="Número do cartão">
-      <input placeholder="Validade">
-      <input placeholder="CVV">
-      <button class="btn blue" onclick="registrarDoacao('Cartão'); sucesso()">Pagar</button>
-      <button class="btn gray" onclick="abrirPagamento(familiaAtual)">← Voltar</button>
-    </div>`;
+  navigator.clipboard.writeText(
+    document.getElementById("pixCode").innerText
+  );
+  alert("Código Pix copiado");
 }
 
 function sucesso(){
@@ -370,8 +368,24 @@ function sucesso(){
     <div class="card" style="text-align:center">
       <h2>❤️ Obrigado!</h2>
       <p>Doação registrada com sucesso.</p>
-    </div>`;
+    </div>
+  `;
   setTimeout(renderHome,3000);
+}
+
+function abrirCartao(){
+  document.getElementById("paymentScreen").innerHTML=`
+    <div class="card">
+      <h3>Pagamento com Cartão</h3>
+      <input placeholder="Nome no cartão">
+      <input placeholder="Número do cartão">
+      <input placeholder="Validade">
+      <input placeholder="CVV">
+      <button class="btn blue" onclick="registrarDoacao('Cartão'); sucesso()">
+        Pagar
+      </button>
+    </div>
+  `;
 }
 
 // START
