@@ -8,7 +8,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Arsenal:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
-*{ box-sizing:border-box }
+/* ===== CORREÇÃO DE ALINHAMENTO ===== */
+*{
+  box-sizing: border-box;
+}
+
 body{
   margin:0;
   font-family:'Space Mono', monospace;
@@ -28,11 +32,32 @@ h1{
   text-align:center;
   font-family:'Arsenal', sans-serif;
   font-weight:700;
+  letter-spacing:1px;
 }
 p{
   color:#555;
   text-align:center;
   font-size:14px;
+  line-height:1.6;
+}
+.tabs{
+  display:flex;
+  gap:8px;
+  margin:16px 0;
+}
+.tab{
+  flex:1;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #ddd;
+  background:#eee;
+  cursor:pointer;
+  font-family:'Space Mono', monospace;
+}
+.tab.active{
+  background:#22c55e;
+  color:#fff;
+  border-color:#22c55e;
 }
 input{
   width:100%;
@@ -41,6 +66,10 @@ input{
   border:1px solid #ddd;
   margin-bottom:10px;
   font-family:'Space Mono', monospace;
+}
+input:focus{
+  outline:none;
+  border-color:#22c55e;
 }
 .btn{
   width:100%;
@@ -51,6 +80,7 @@ input{
   color:#fff;
   font-size:16px;
   cursor:pointer;
+  font-family:'Space Mono', monospace;
   font-weight:700;
 }
 .btn.secondary{
@@ -58,13 +88,40 @@ input{
   color:#111;
   margin-top:10px;
 }
+.hidden{display:none}
+.back{
+  color:#22c55e;
+  cursor:pointer;
+  margin-bottom:10px;
+  display:inline-block;
+}
 .logo{
   width:260px;
   max-width:90%;
   display:block;
   margin:20px auto;
 }
-.hidden{ display:none }
+.section-title{
+  margin:18px 0 10px;
+  font-family:'Arsenal', sans-serif;
+  font-size:18px;
+  font-weight:700;
+  color:#111;
+}
+
+/* ===== FRASE DE SEGURANÇA DESTACADA ===== */
+.secure-footer{
+  margin-top:16px;
+  padding:12px 14px;
+  background:#ecfdf5;
+  border-left:4px solid #22c55e;
+  border-radius:10px;
+  font-size:13px;
+  color:#065f46;
+  text-align:center;
+  line-height:1.5;
+  font-weight:600;
+}
 </style>
 </head>
 
@@ -72,43 +129,107 @@ input{
 
 <div class="phone">
 
+<!-- LOGIN -->
+<div id="login">
   <h1>Olá, bem-vindo(a) ao Zoê!</h1>
 
-  <img class="logo" src="assets/logo.png" alt="Zoê">
+  <img class="logo" src="./assets/logo.png" alt="Zoê: A vida em nós">
 
   <p>Onde a vida floresce!</p>
 
-  <!-- LOGIN -->
-  <div id="login">
-    <input id="email" placeholder="Email">
-    <input id="senha" type="password" placeholder="Senha">
-    <button class="btn" onclick="entrar()">Entrar</button>
+  <h3 style="text-align:center;font-family:'Arsenal',sans-serif;">Entrar no Zoê</h3>
+
+  <input placeholder="Email">
+  <input type="password" placeholder="Senha">
+
+  <button class="btn" onclick="entrar()">Entrar</button>
+  <button class="btn secondary" onclick="abrirCadastro()">Criar conta</button>
+</div>
+
+<!-- CADASTRO -->
+<div id="cadastro" class="hidden">
+  <span class="back" onclick="voltarLogin()">← Voltar</span>
+
+  <h3 style="font-family:'Arsenal',sans-serif;">Criar conta</h3>
+
+  <div class="tabs">
+    <button class="tab active" onclick="setTab(this)">Família</button>
+    <button class="tab" onclick="setTab(this)">Padrinho</button>
+    <button class="tab" onclick="setTab(this)">Instituição</button>
   </div>
+
+  <div class="section-title">Dados pessoais</div>
+
+  <input placeholder="Nome completo">
+  <input placeholder="RG">
+  <input placeholder="CPF">
+
+  <input placeholder="Email">
+  <input placeholder="Telefone">
+
+  <div class="section-title">Dados bancários</div>
+
+  <input placeholder="Banco">
+  <input placeholder="Número da conta">
+  <input placeholder="Agência">
+  <input placeholder="CPF/CNPJ da conta">
+
+  <div class="section-title">Crie sua senha de acesso</div>
+
+  <input type="password" placeholder="Senha">
+  <input type="password" placeholder="Confirmar senha">
+
+  <button class="btn" onclick="finalizarCadastro()">Cadastrar</button>
+
+  <div class="secure-footer">
+    As informações fornecidas estão seguras e não serão compartilhadas.
+  </div>
+</div>
 
 </div>
 
 <script>
-/*
-  ⚠️ IMPORTANTE
-  - NÃO existe redirect automático
-  - Só entra no app clicando no botão
-  - Isso evita loop no GitHub Pages
-*/
+function setTab(el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function abrirCadastro(){
+  document.getElementById('login').classList.add('hidden');
+  document.getElementById('cadastro').classList.remove('hidden');
+}
+
+function voltarLogin(){
+  document.getElementById('cadastro').classList.add('hidden');
+  document.getElementById('login').classList.remove('hidden');
+}
+
+function finalizarCadastro(){
+  const tipo = document.querySelector('#cadastro .tab.active')?.innerText;
+
+  if(!tipo){
+    alert("Escolha o tipo de cadastro");
+    return;
+  }
+
+  localStorage.setItem("tipoCadastro", tipo);
+
+  alert("Cadastro realizado como " + tipo + "! Faça login.");
+  voltarLogin();
+}
 
 function entrar(){
-  const email = document.getElementById("email").value.trim();
+  const email = document.querySelector('#login input[placeholder="Email"]').value;
 
   if(!email){
     alert("Informe o email");
     return;
   }
 
-  // salva usuário
   localStorage.setItem("usuarioLogado", JSON.stringify({
     email: email
   }));
 
-  // vai para o app SOMENTE aqui
   window.location.href = "app.html";
 }
 </script>
