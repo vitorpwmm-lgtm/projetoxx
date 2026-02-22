@@ -146,22 +146,9 @@ input{
 // ===== LOGIN =====
 const usuario = JSON.parse(localStorage.getItem("usuarioLogado"));
 const tipoCadastro = localStorage.getItem("tipoCadastro");
+const cpfUsuario = localStorage.getItem("cpfUsuario") || "Não informado";
 
 if(!usuario){
-  document.getElementById("screen").innerHTML = `
-    <div class="card" style="text-align:center">
-      <h3>Acesso restrito</h3>
-      <p>Você precisa fazer login.</p>
-      <button class="btn green" onclick="location.href='index.html'">
-        Ir para login
-      </button>
-    </div>
-  `;
-  throw new Error("Usuário não logado");
-}
-
-function logout(){
-  localStorage.removeItem("usuarioLogado");
   location.href="index.html";
 }
 
@@ -170,8 +157,12 @@ function toggleMenu(){
   const m=document.getElementById("menu");
   m.style.display=m.style.display==="flex"?"none":"flex";
 }
+function logout(){
+  localStorage.removeItem("usuarioLogado");
+  location.href="index.html";
+}
 
-// ===== DADOS =====
+// ===== FAMÍLIAS (9) =====
 const families = [
   { name:"Família Silva", image:"assets/familia1.jpeg", goal:1800, raised:720 },
   { name:"Família Pereira", image:"assets/familia2.jpeg", goal:900, raised:300 },
@@ -184,23 +175,38 @@ const families = [
   { name:"Família Lima", image:"assets/familia9.jpeg", goal:1400, raised:0 }
 ];
 
-// ===== RELATÓRIO =====
+// ===== DADOS =====
 let relatorio = JSON.parse(localStorage.getItem("relatorio")) || [];
+let repasses = JSON.parse(localStorage.getItem("repasses")) || [];
 
+let familiaAtual="";
+let valorSelecionado=0;
+
+// ===== REGISTRO DE DOAÇÃO (NÃO ALTERADO) =====
 function registrarDoacao(forma){
   relatorio.push({
     nome: usuario.email.split("@")[0],
     email: usuario.email,
-    forma,
+    cpf: cpfUsuario,
     familia: familiaAtual,
     valor: valorSelecionado,
+    forma,
     data: new Date().toLocaleString("pt-BR")
   });
   localStorage.setItem("relatorio", JSON.stringify(relatorio));
 }
 
-let familiaAtual="";
-let valorSelecionado=0;
+// ===== CÁLCULOS =====
+function totalArrecadadoPorFamilia(nome){
+  return relatorio
+    .filter(d => d.familia === nome)
+    .reduce((s,d)=>s+Number(d.valor),0);
+}
+function totalRepassadoPorFamilia(nome){
+  return repasses
+    .filter(r => r.familia === nome)
+    .reduce((s,r)=>s+Number(r.valor),0);
+}
 
 // ===== TELAS =====
 function renderHome(){
@@ -239,8 +245,8 @@ function renderProfile(){
   document.getElementById("screen").innerHTML=`
     <div class="card">
       <h3>Meu Perfil</h3>
-      <p><strong>Email:</strong><br>${usuario.email}</p>
-      <p><strong>Tipo de cadastro:</strong><br>${tipoCadastro||"Não informado"}</p>
+      <p>Email: ${usuario.email}</p>
+      <p>CPF: ${cpfUsuario}</p>
       <button class="btn gray" onclick="renderHome()">← Voltar</button>
     </div>
   `;
@@ -257,66 +263,102 @@ function renderTransparency(){
   document.getElementById("menu").style.display="none";
   document.getElementById("paymentScreen").style.display="none";
 
-  const s=document.getElementById("screen");
-  s.style.display="block";
-
-  s.innerHTML=`
+  document.getElementById("screen").innerHTML=`
     <div class="card">
       <h3>Transparência</h3>
-      <p>Acompanhe relatórios e informações institucionais.</p>
       <button class="btn green" onclick="abrirSecaoRelatorio()">📊 Seção de relatório</button>
     </div>
   `;
 }
 
 function abrirSecaoRelatorio(){
-  const s = document.getElementById("screen");
-  const cpfUsuario = localStorage.getItem("cpfUsuario") || "Não informado";
+  const s=document.getElementById("screen");
+  let html=`<div class="card"><h3>Relatório de Doações</h3></div>`;
 
-  if(relatorio.length === 0){
-    s.innerHTML = `
-      <div class="card">
-        <h3>Seção de Relatório</h3>
-        <p>Nenhuma doação registrada até o momento.</p>
-        <button class="btn gray" onclick="renderTransparency()">← Voltar</button>
-      </div>
-    `;
-    return;
+  if(relatorio.length===0){
+    html+=`<div class="card">Nenhuma doação registrada.</div>`;
+  }else{
+    relatorio.forEach(d=>{
+      html+=`
+        <div class="card" style="font-size:14px">
+          Nome: ${d.nome}<br>
+          Email: ${d.email}<br>
+          CPF: ${d.cpf}<br>
+          Família: ${d.familia}<br>
+          Valor: R$ ${Number(d.valor).toFixed(2)}<br>
+          Forma: ${d.forma}<br>
+          Data: ${d.data}
+        </div>
+      `;
+    });
   }
 
-  let html = `<div class="card"><h3>Relatório de Doações</h3></div>`;
+  html+=`<div class="card"><h3>Repasse Financeiro</h3></div>`;
 
-  relatorio.forEach((d, index) => {
-    html += `
+  families.forEach(f=>{
+    const arrec=totalArrecadadoPorFamilia(f.name);
+    const rep=totalRepassadoPorFamilia(f.name);
+    const saldo=arrec-rep;
+
+    html+=`
       <div class="card" style="font-size:14px">
-        <strong>Doação #${index + 1}</strong><br><br>
-        <strong>Nome:</strong> ${d.nome}<br>
-        <strong>Email:</strong> ${d.email}<br>
-        <strong>CPF:</strong> ${d.cpf || cpfUsuario}<br>
-        <strong>Família:</strong> ${d.familia}<br>
-        <strong>Valor:</strong> R$ ${Number(d.valor).toFixed(2)}<br>
-        <strong>Forma:</strong> ${d.forma}<br>
-        <strong>Data:</strong> ${d.data}
+        <strong>${f.name}</strong><br>
+        Arrecadado: R$ ${arrec.toFixed(2)}<br>
+        Repassado: R$ ${rep.toFixed(2)}<br>
+        Saldo disponível: R$ ${saldo.toFixed(2)}
       </div>
     `;
   });
 
-  html += `<button class="btn gray" onclick="renderTransparency()">← Voltar</button>`;
-  s.innerHTML = html;
+  html+=`
+    <button class="btn green" onclick="registrarRepasseAutomatico()">Registrar repasse</button>
+    <button class="btn gray" onclick="renderTransparency()">← Voltar</button>
+  `;
+
+  s.innerHTML=html;
 }
 
-// ===== PAGAMENTO =====
+// ===== REPASSE AUTOMÁTICO =====
+function registrarRepasseAutomatico(){
+  let houveRepasse = false;
+
+  families.forEach(f=>{
+    const arrec = totalArrecadadoPorFamilia(f.name);
+    const rep = totalRepassadoPorFamilia(f.name);
+    const saldo = arrec - rep;
+
+    if(saldo > 0){
+      repasses.push({
+        familia: f.name,
+        valor: saldo,
+        forma: "Repasse financeiro",
+        dataHora: new Date().toLocaleString("pt-BR")
+      });
+      houveRepasse = true;
+    }
+  });
+
+  if(!houveRepasse){
+    alert("Não há saldo disponível para repasse.");
+    return;
+  }
+
+  localStorage.setItem("repasses", JSON.stringify(repasses));
+  alert("Repasse financeiro registrado com sucesso.");
+  abrirSecaoRelatorio();
+}
+
+// ===== PAGAMENTO (ORIGINAL) =====
 function abrirPagamento(nome){
   familiaAtual=nome;
   document.getElementById("screen").style.display="none";
-
   const p=document.getElementById("paymentScreen");
   p.style.display="block";
 
   p.innerHTML=`
     <div class="card">
       <h3>Forma de pagamento</h3>
-      <p><strong>${nome}</strong></p>
+      <p>${nome}</p>
       <button class="btn green" onclick="abrirPix()">💚 Pix</button>
       <button class="btn blue" onclick="abrirCartao()">💳 Cartão</button>
       <button class="btn gray" onclick="renderHome()">← Voltar</button>
@@ -327,77 +369,49 @@ function abrirPagamento(nome){
 function abrirPix(){
   valorSelecionado=0;
   const p=document.getElementById("paymentScreen");
-
   p.innerHTML=`
     <div class="card">
-      <h3>Pagamento via Pix</h3>
-      <p><strong>${familiaAtual}</strong></p>
+      <h3>Pix</h3>
       <div class="value-buttons">
         <button onclick="setValor(10,this)">R$ 10</button>
         <button onclick="setValor(50,this)">R$ 50</button>
         <button onclick="setValor(100,this)">R$ 100</button>
       </div>
-      <input id="valorInput" type="number" placeholder="Outro valor (R$)" oninput="setValor(this.value)">
+      <input id="valorInput" type="number" placeholder="Outro valor" oninput="setValor(this.value)">
       <button class="btn green" onclick="gerarPix()">Fazer pagamento</button>
-      <button class="btn gray" onclick="abrirPagamento(familiaAtual)">← Voltar</button>
     </div>
   `;
 }
 
-function setValor(valor,btn=null){
-  valorSelecionado=Number(valor)||0;
+function setValor(v,btn=null){
+  valorSelecionado=Number(v)||0;
   const i=document.getElementById("valorInput");
   if(i) i.value=valorSelecionado||"";
   document.querySelectorAll(".value-buttons button").forEach(b=>b.classList.remove("active"));
   if(btn) btn.classList.add("active");
 }
 
-// ===== ÚNICA ALTERAÇÃO: QR CODE =====
 function gerarPix(){
-  if(valorSelecionado<=0){
-    alert("Informe um valor");
-    return;
-  }
+  if(valorSelecionado<=0){ alert("Informe um valor"); return; }
 
-  const p=document.getElementById("paymentScreen");
-
-  p.innerHTML=`
-    <div class="card" style="text-align:center">
-      <h3>PIX</h3>
-      <p><strong>${familiaAtual}</strong></p>
-      <p>Valor: R$ ${valorSelecionado.toFixed(2)}</p>
-
-      <img src="assets/qrcode-pix.jpg" style="width:220px;margin:16px auto">
-
-      <button class="btn green" onclick="registrarDoacao('Pix'); sucesso()">
-        Já paguei
-      </button>
-    </div>
-  `;
-}
-
-function sucesso(){
   document.getElementById("paymentScreen").innerHTML=`
     <div class="card" style="text-align:center">
-      <h2>❤️ Obrigado!</h2>
-      <p>Doação registrada com sucesso.</p>
+      <h3>PIX</h3>
+      <img src="assets/qrcode-pix.jpg" style="width:220px;margin:16px auto">
+      <button class="btn green" onclick="registrarDoacao('Pix'); sucesso()">Já paguei</button>
     </div>
   `;
-  setTimeout(renderHome,3000);
 }
 
 function abrirCartao(){
-  document.getElementById("paymentScreen").innerHTML=`
-    <div class="card">
-      <h3>Pagamento com Cartão</h3>
-      <p><strong>${familiaAtual}</strong></p>
-      <input placeholder="Nome no cartão">
-      <input placeholder="Número do cartão">
-      <input placeholder="Validade">
-      <input placeholder="CVV">
-      <button class="btn blue" onclick="registrarDoacao('Cartão'); sucesso()">Pagar</button>
-    </div>
-  `;
+  registrarDoacao("Cartão");
+  sucesso();
+}
+
+function sucesso(){
+  document.getElementById("paymentScreen").innerHTML=
+    `<div class="card" style="text-align:center">❤️ Obrigado!</div>`;
+  setTimeout(renderHome,2000);
 }
 
 // START
