@@ -166,6 +166,7 @@ input{
   <div onclick="renderHome()">Início</div>
   <div onclick="renderDonations()">Doações</div>
   <div onclick="renderTransparency()">Transparência</div>
+  <div onclick="renderProfile()">Perfil</div>
 </div>
 
 </div>
@@ -173,9 +174,12 @@ input{
 <script>
 // ===== LOGIN =====
 const usuario = JSON.parse(localStorage.getItem("usuarioLogado"));
+const tipoCadastro = localStorage.getItem("tipoCadastro");
+
 if(!usuario){
   window.location.href = "index.html";
 }
+
 function handleAuth(){
   localStorage.removeItem("usuarioLogado");
   window.location.href = "index.html";
@@ -228,6 +232,31 @@ function renderHome(){
   });
 }
 
+// ===== PERFIL =====
+function renderProfile(){
+  document.getElementById("menu").style.display="none";
+
+  const s = document.getElementById("screen");
+  const p = document.getElementById("paymentScreen");
+
+  p.style.display="none";
+  s.style.display="block";
+
+  s.innerHTML = `
+    <div class="card">
+      <h3>Meu Perfil</h3>
+
+      <p><strong>Email:</strong><br>${usuario.email}</p>
+
+      <p><strong>Tipo de cadastro:</strong><br>
+        ${tipoCadastro ? tipoCadastro : "Não informado"}
+      </p>
+
+      <button class="btn gray" onclick="renderHome()">← Voltar</button>
+    </div>
+  `;
+}
+
 function renderDonations(){
   document.getElementById("menu").style.display="none";
   document.getElementById("screen").innerHTML =
@@ -254,6 +283,7 @@ function abrirPagamento(nome){
 
       <button class="btn green" onclick="abrirPix()">💚 Pix</button>
       <button class="btn blue" onclick="abrirCartao()">💳 Cartão</button>
+
       <button class="btn gray" onclick="renderHome()">← Voltar</button>
     </div>
   `;
@@ -287,7 +317,8 @@ function setValor(valor,botao=null){
   valorSelecionado=Number(valor)||0;
   const i=document.getElementById("valorInput");
   if(i) i.value=valorSelecionado||"";
-  document.querySelectorAll(".value-buttons button").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".value-buttons button")
+    .forEach(b=>b.classList.remove("active"));
   if(botao) botao.classList.add("active");
 }
 
