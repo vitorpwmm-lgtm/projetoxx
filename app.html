@@ -264,30 +264,45 @@ function renderTransparency(){
     <div class="card">
       <h3>Transparência</h3>
       <p>Acompanhe relatórios e informações institucionais.</p>
-
-      <button class="btn green" onclick="abrirSecaoRelatorio()">
-        📊 Seção de relatório
-      </button>
+      <button class="btn green" onclick="abrirSecaoRelatorio()">📊 Seção de relatório</button>
     </div>
   `;
 }
 
 function abrirSecaoRelatorio(){
-  const s=document.getElementById("screen");
+  const s = document.getElementById("screen");
+  const cpfUsuario = localStorage.getItem("cpfUsuario") || "Não informado";
 
-  s.innerHTML=`
-    <div class="card">
-      <h3>Seção de Relatório</h3>
-      <p><strong>Identificação</strong></p>
-      <p>
-        Projeto: Zoê<br>
-        Responsável: Administração<br>
-        Data: ${new Date().toLocaleDateString("pt-BR")}
-      </p>
+  if(relatorio.length === 0){
+    s.innerHTML = `
+      <div class="card">
+        <h3>Seção de Relatório</h3>
+        <p>Nenhuma doação registrada até o momento.</p>
+        <button class="btn gray" onclick="renderTransparency()">← Voltar</button>
+      </div>
+    `;
+    return;
+  }
 
-      <button class="btn gray" onclick="renderTransparency()">← Voltar</button>
-    </div>
-  `;
+  let html = `<div class="card"><h3>Relatório de Doações</h3></div>`;
+
+  relatorio.forEach((d, index) => {
+    html += `
+      <div class="card" style="font-size:14px">
+        <strong>Doação #${index + 1}</strong><br><br>
+        <strong>Nome:</strong> ${d.nome}<br>
+        <strong>Email:</strong> ${d.email}<br>
+        <strong>CPF:</strong> ${d.cpf || cpfUsuario}<br>
+        <strong>Família:</strong> ${d.familia}<br>
+        <strong>Valor:</strong> R$ ${Number(d.valor).toFixed(2)}<br>
+        <strong>Forma:</strong> ${d.forma}<br>
+        <strong>Data:</strong> ${d.data}
+      </div>
+    `;
+  });
+
+  html += `<button class="btn gray" onclick="renderTransparency()">← Voltar</button>`;
+  s.innerHTML = html;
 }
 
 // ===== PAGAMENTO =====
@@ -302,7 +317,6 @@ function abrirPagamento(nome){
     <div class="card">
       <h3>Forma de pagamento</h3>
       <p><strong>${nome}</strong></p>
-
       <button class="btn green" onclick="abrirPix()">💚 Pix</button>
       <button class="btn blue" onclick="abrirCartao()">💳 Cartão</button>
       <button class="btn gray" onclick="renderHome()">← Voltar</button>
@@ -318,16 +332,12 @@ function abrirPix(){
     <div class="card">
       <h3>Pagamento via Pix</h3>
       <p><strong>${familiaAtual}</strong></p>
-
       <div class="value-buttons">
         <button onclick="setValor(10,this)">R$ 10</button>
         <button onclick="setValor(50,this)">R$ 50</button>
         <button onclick="setValor(100,this)">R$ 100</button>
       </div>
-
-      <input id="valorInput" type="number" placeholder="Outro valor (R$)" 
-        oninput="setValor(this.value)">
-
+      <input id="valorInput" type="number" placeholder="Outro valor (R$)" oninput="setValor(this.value)">
       <button class="btn green" onclick="gerarPix()">Fazer pagamento</button>
       <button class="btn gray" onclick="abrirPagamento(familiaAtual)">← Voltar</button>
     </div>
@@ -338,19 +348,38 @@ function setValor(valor,btn=null){
   valorSelecionado=Number(valor)||0;
   const i=document.getElementById("valorInput");
   if(i) i.value=valorSelecionado||"";
-  document.querySelectorAll(".value-buttons button")
-    .forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".value-buttons button").forEach(b=>b.classList.remove("active"));
   if(btn) btn.classList.add("active");
 }
 
+// ===== ÚNICA ALTERAÇÃO: QR CODE =====
 function gerarPix(){
-  if(valorSelecionado<=0){ alert("Informe um valor"); return; }
+  if(valorSelecionado<=0){
+    alert("Informe um valor");
+    return;
+  }
 
-  registrarDoacao("Pix");
+  const p=document.getElementById("paymentScreen");
 
+  p.innerHTML=`
+    <div class="card" style="text-align:center">
+      <h3>PIX</h3>
+      <p><strong>${familiaAtual}</strong></p>
+      <p>Valor: R$ ${valorSelecionado.toFixed(2)}</p>
+
+      <img src="assets/qrcode-pix.jpg" style="width:220px;margin:16px auto">
+
+      <button class="btn green" onclick="registrarDoacao('Pix'); sucesso()">
+        Já paguei
+      </button>
+    </div>
+  `;
+}
+
+function sucesso(){
   document.getElementById("paymentScreen").innerHTML=`
     <div class="card" style="text-align:center">
-      <h3>❤️ Obrigado!</h3>
+      <h2>❤️ Obrigado!</h2>
       <p>Doação registrada com sucesso.</p>
     </div>
   `;
@@ -358,21 +387,15 @@ function gerarPix(){
 }
 
 function abrirCartao(){
-  const p=document.getElementById("paymentScreen");
-
-  p.innerHTML=`
+  document.getElementById("paymentScreen").innerHTML=`
     <div class="card">
       <h3>Pagamento com Cartão</h3>
       <p><strong>${familiaAtual}</strong></p>
-
       <input placeholder="Nome no cartão">
       <input placeholder="Número do cartão">
       <input placeholder="Validade">
       <input placeholder="CVV">
-
-      <button class="btn blue" onclick="registrarDoacao('Cartão'); renderHome()">
-        Pagar
-      </button>
+      <button class="btn blue" onclick="registrarDoacao('Cartão'); sucesso()">Pagar</button>
     </div>
   `;
 }
