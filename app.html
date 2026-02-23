@@ -162,7 +162,7 @@ function logout(){
   location.href="index.html";
 }
 
-// ===== FAMÍLIAS (9) =====
+// ===== FAMÍLIAS =====
 const families = [
   { name:"Família Silva", image:"assets/familia1.jpeg", goal:1800, raised:720 },
   { name:"Família Pereira", image:"assets/familia2.jpeg", goal:900, raised:300 },
@@ -182,7 +182,7 @@ let repasses = JSON.parse(localStorage.getItem("repasses")) || [];
 let familiaAtual="";
 let valorSelecionado=0;
 
-// ===== REGISTRO DE DOAÇÃO (NÃO ALTERADO) =====
+// ===== REGISTRO DE DOAÇÃO =====
 function registrarDoacao(forma){
   relatorio.push({
     nome: usuario.email.split("@")[0],
@@ -198,13 +198,11 @@ function registrarDoacao(forma){
 
 // ===== CÁLCULOS =====
 function totalArrecadadoPorFamilia(nome){
-  return relatorio
-    .filter(d => d.familia === nome)
+  return relatorio.filter(d => d.familia === nome)
     .reduce((s,d)=>s+Number(d.valor),0);
 }
 function totalRepassadoPorFamilia(nome){
-  return repasses
-    .filter(r => r.familia === nome)
+  return repasses.filter(r => r.familia === nome)
     .reduce((s,r)=>s+Number(r.valor),0);
 }
 
@@ -215,12 +213,7 @@ function renderHome(){
   const s=document.getElementById("screen");
   s.style.display="block";
 
-  s.innerHTML=`
-    <div class="card">
-      <h3>Bem-vindo(a)!</h3>
-      <p>Ajude famílias através do apadrinhamento.</p>
-    </div>
-  `;
+  s.innerHTML=`<div class="card"><h3>Bem-vindo(a)!</h3><p>Ajude famílias através do apadrinhamento.</p></div>`;
 
   families.forEach(f=>{
     const percent=Math.min((f.raised/f.goal)*100,100);
@@ -229,14 +222,9 @@ function renderHome(){
         <img src="${f.image}">
         <strong>${f.name}</strong>
         <p>R$ ${f.raised} / R$ ${f.goal}</p>
-        <div class="progress">
-          <div class="progress-fill" style="width:${percent}%"></div>
-        </div>
-        <button class="btn" onclick="abrirPagamento('${f.name}')">
-          Apadrinhar
-        </button>
-      </div>
-    `;
+        <div class="progress"><div class="progress-fill" style="width:${percent}%"></div></div>
+        <button class="btn" onclick="abrirPagamento('${f.name}')">Apadrinhar</button>
+      </div>`;
   });
 }
 
@@ -248,8 +236,7 @@ function renderProfile(){
       <p>Email: ${usuario.email}</p>
       <p>CPF: ${cpfUsuario}</p>
       <button class="btn gray" onclick="renderHome()">← Voltar</button>
-    </div>
-  `;
+    </div>`;
 }
 
 function renderDonations(){
@@ -262,13 +249,12 @@ function renderDonations(){
 function renderTransparency(){
   document.getElementById("menu").style.display="none";
   document.getElementById("paymentScreen").style.display="none";
-
   document.getElementById("screen").innerHTML=`
     <div class="card">
       <h3>Transparência</h3>
       <button class="btn green" onclick="abrirSecaoRelatorio()">📊 Seção de relatório</button>
-    </div>
-  `;
+      <button class="btn blue" onclick="emitirPDF()">📄 Emitir PDF</button>
+    </div>`;
 }
 
 function abrirSecaoRelatorio(){
@@ -288,8 +274,7 @@ function abrirSecaoRelatorio(){
           Valor: R$ ${Number(d.valor).toFixed(2)}<br>
           Forma: ${d.forma}<br>
           Data: ${d.data}
-        </div>
-      `;
+        </div>`;
     });
   }
 
@@ -306,55 +291,37 @@ function abrirSecaoRelatorio(){
         Arrecadado: R$ ${arrec.toFixed(2)}<br>
         Repassado: R$ ${rep.toFixed(2)}<br>
         Saldo disponível: R$ ${saldo.toFixed(2)}
-      </div>
-    `;
+      </div>`;
   });
 
   html+=`
     <button class="btn green" onclick="registrarRepasseAutomatico()">Registrar repasse</button>
-    <button class="btn gray" onclick="renderTransparency()">← Voltar</button>
-  `;
-
+    <button class="btn gray" onclick="renderTransparency()">← Voltar</button>`;
   s.innerHTML=html;
 }
 
-// ===== REPASSE AUTOMÁTICO =====
+// ===== REPASSE =====
 function registrarRepasseAutomatico(){
-  let houveRepasse = false;
-
+  let houve=false;
   families.forEach(f=>{
-    const arrec = totalArrecadadoPorFamilia(f.name);
-    const rep = totalRepassadoPorFamilia(f.name);
-    const saldo = arrec - rep;
-
-    if(saldo > 0){
-      repasses.push({
-        familia: f.name,
-        valor: saldo,
-        forma: "Repasse financeiro",
-        dataHora: new Date().toLocaleString("pt-BR")
-      });
-      houveRepasse = true;
+    const saldo=totalArrecadadoPorFamilia(f.name)-totalRepassadoPorFamilia(f.name);
+    if(saldo>0){
+      repasses.push({familia:f.name,valor:saldo,forma:"Repasse financeiro",dataHora:new Date().toLocaleString("pt-BR")});
+      houve=true;
     }
   });
-
-  if(!houveRepasse){
-    alert("Não há saldo disponível para repasse.");
-    return;
-  }
-
+  if(!houve){ alert("Não há saldo disponível."); return; }
   localStorage.setItem("repasses", JSON.stringify(repasses));
-  alert("Repasse financeiro registrado com sucesso.");
+  alert("Repasse registrado com sucesso.");
   abrirSecaoRelatorio();
 }
 
-// ===== PAGAMENTO (ORIGINAL) =====
+// ===== PAGAMENTO =====
 function abrirPagamento(nome){
   familiaAtual=nome;
   document.getElementById("screen").style.display="none";
   const p=document.getElementById("paymentScreen");
   p.style.display="block";
-
   p.innerHTML=`
     <div class="card">
       <h3>Forma de pagamento</h3>
@@ -362,14 +329,12 @@ function abrirPagamento(nome){
       <button class="btn green" onclick="abrirPix()">💚 Pix</button>
       <button class="btn blue" onclick="abrirCartao()">💳 Cartão</button>
       <button class="btn gray" onclick="renderHome()">← Voltar</button>
-    </div>
-  `;
+    </div>`;
 }
 
 function abrirPix(){
   valorSelecionado=0;
-  const p=document.getElementById("paymentScreen");
-  p.innerHTML=`
+  document.getElementById("paymentScreen").innerHTML=`
     <div class="card">
       <h3>Pix</h3>
       <div class="value-buttons">
@@ -379,8 +344,7 @@ function abrirPix(){
       </div>
       <input id="valorInput" type="number" placeholder="Outro valor" oninput="setValor(this.value)">
       <button class="btn green" onclick="gerarPix()">Fazer pagamento</button>
-    </div>
-  `;
+    </div>`;
 }
 
 function setValor(v,btn=null){
@@ -393,14 +357,12 @@ function setValor(v,btn=null){
 
 function gerarPix(){
   if(valorSelecionado<=0){ alert("Informe um valor"); return; }
-
   document.getElementById("paymentScreen").innerHTML=`
     <div class="card" style="text-align:center">
       <h3>PIX</h3>
       <img src="assets/qrcode-pix.jpg" style="width:220px;margin:16px auto">
       <button class="btn green" onclick="registrarDoacao('Pix'); sucesso()">Já paguei</button>
-    </div>
-  `;
+    </div>`;
 }
 
 function abrirCartao(){
@@ -409,14 +371,56 @@ function abrirCartao(){
 }
 
 function sucesso(){
-  document.getElementById("paymentScreen").innerHTML=
-    `<div class="card" style="text-align:center">❤️ Obrigado!</div>`;
+  document.getElementById("paymentScreen").innerHTML=`<div class="card" style="text-align:center">❤️ Obrigado!</div>`;
   setTimeout(renderHome,2000);
+}
+
+// ===== PDF =====
+function emitirPDF(){
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF();
+  let y=10;
+
+  pdf.setFontSize(16);
+  pdf.text("Relatório de Transparência - Zoê",10,y);
+  y+=10;
+
+  pdf.setFontSize(12);
+  pdf.text("Relatório de Doações",10,y);
+  y+=8;
+
+  relatorio.forEach(d=>{
+    pdf.text(`Nome: ${d.nome}`,10,y);y+=6;
+    pdf.text(`Email: ${d.email}`,10,y);y+=6;
+    pdf.text(`CPF: ${d.cpf}`,10,y);y+=6;
+    pdf.text(`Família: ${d.familia}`,10,y);y+=6;
+    pdf.text(`Valor: R$ ${Number(d.valor).toFixed(2)}`,10,y);y+=6;
+    pdf.text(`Forma: ${d.forma}`,10,y);y+=6;
+    pdf.text(`Data: ${d.data}`,10,y);y+=8;
+    if(y>270){ pdf.addPage(); y=10; }
+  });
+
+  pdf.addPage(); y=10;
+  pdf.text("Repasse Financeiro",10,y); y+=8;
+
+  families.forEach(f=>{
+    const arrec=totalArrecadadoPorFamilia(f.name);
+    const rep=totalRepassadoPorFamilia(f.name);
+    const saldo=arrec-rep;
+    pdf.text(f.name,10,y);y+=6;
+    pdf.text(`Arrecadado: R$ ${arrec.toFixed(2)}`,10,y);y+=6;
+    pdf.text(`Repassado: R$ ${rep.toFixed(2)}`,10,y);y+=6;
+    pdf.text(`Saldo: R$ ${saldo.toFixed(2)}`,10,y);y+=8;
+  });
+
+  pdf.save("relatorio-transparencia-zoe.pdf");
 }
 
 // START
 renderHome();
 </script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 </div>
 </body>
