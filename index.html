@@ -90,9 +90,7 @@ button{
 
 <div class="container">
 
-  <!-- LOGO -->
   <div class="logo">
-    <!-- troque o src pelo caminho da sua logo -->
     <img src="./assets/logo.jpeg" alt="Zoê">
   </div>
 
@@ -110,38 +108,42 @@ button{
     <h2>Cadastro</h2>
 
     <div class="tabs">
-  <div class="tab active" onclick="selecionarTipo(this)">Família</div>
-  <div class="tab" onclick="selecionarTipo(this)">Padrinho</div>
-  <div class="tab" onclick="selecionarTipo(this)">Instituição</div>
-</div>
+      <div class="tab active" onclick="selecionarTipo(this)">Família</div>
+      <div class="tab" onclick="selecionarTipo(this)">Padrinho</div>
+      <div class="tab" onclick="selecionarTipo(this)">Instituição</div>
+    </div>
 
-    <!-- Dados pessoais -->
     <input id="nome" placeholder="Nome completo">
     <input id="rg" placeholder="RG">
     <input id="cpf" placeholder="CPF">
     <input id="emailCadastro" placeholder="Email">
     <input id="telefone" placeholder="Telefone">
 
-    <!-- Dados bancários -->
     <input id="banco" placeholder="Banco">
     <input id="agencia" placeholder="Agência">
     <input id="conta" placeholder="Número da conta">
     <input id="cpfCnpjConta" placeholder="CPF/CNPJ da conta">
 
-    <!-- Senha -->
     <input id="senha" type="password" placeholder="Senha">
     <input id="confirmarSenha" type="password" placeholder="Confirmar senha">
 
     <button onclick="finalizarCadastro()">Cadastrar</button>
     <div class="link" onclick="voltarLogin()">Já tenho conta</div>
-  <div class="aviso-seguranca">
-  🔒 As informações fornecidas estão seguras e não serão compartilhadas.
-</div>
+  </div>
 
 </div>
 
 <script>
-/* TELAS */
+// ===== CONTROLE SEGURO DO STORAGE =====
+let usuarios = [];
+try{
+  usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+  if(!Array.isArray(usuarios)) usuarios = [];
+}catch(e){
+  usuarios = [];
+}
+
+// ===== TELAS =====
 function mostrarCadastro(){
   document.getElementById("login").classList.add("hidden");
   document.getElementById("cadastro").classList.remove("hidden");
@@ -151,18 +153,18 @@ function voltarLogin(){
   document.getElementById("login").classList.remove("hidden");
 }
 
-/* TIPO CADASTRO */
+// ===== TIPO CADASTRO =====
 function selecionarTipo(el){
   document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
   el.classList.add("active");
 }
 
-/* CADASTRO */
+// ===== CADASTRO =====
 function finalizarCadastro(){
   const tipo = document.querySelector('#cadastro .tab.active')?.innerText;
 
-  const senha = document.getElementById("senha").value;
-  const confirmar = document.getElementById("confirmarSenha").value;
+  const senha = document.getElementById("senha").value.trim();
+  const confirmar = document.getElementById("confirmarSenha").value.trim();
 
   if(senha !== confirmar){
     alert("As senhas não conferem");
@@ -170,17 +172,15 @@ function finalizarCadastro(){
   }
 
   const usuario = {
-    nome: document.getElementById("nome").value,
-    rg: document.getElementById("rg").value,
-    cpf: document.getElementById("cpf").value,
-    email: document.getElementById("emailCadastro").value,
-    telefone: document.getElementById("telefone").value,
-
-    banco: document.getElementById("banco").value,
-    agencia: document.getElementById("agencia").value,
-    conta: document.getElementById("conta").value,
-    cpfCnpjConta: document.getElementById("cpfCnpjConta").value,
-
+    nome: document.getElementById("nome").value.trim(),
+    rg: document.getElementById("rg").value.trim(),
+    cpf: document.getElementById("cpf").value.trim(),
+    email: document.getElementById("emailCadastro").value.trim().toLowerCase(),
+    telefone: document.getElementById("telefone").value.trim(),
+    banco: document.getElementById("banco").value.trim(),
+    agencia: document.getElementById("agencia").value.trim(),
+    conta: document.getElementById("conta").value.trim(),
+    cpfCnpjConta: document.getElementById("cpfCnpjConta").value.trim(),
     senha: senha,
     tipoCadastro: tipo
   };
@@ -190,29 +190,28 @@ function finalizarCadastro(){
     return;
   }
 
-  const usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+  if(usuarios.find(u => u.email === usuario.email)){
+    alert("Este email já está cadastrado");
+    return;
+  }
 
-// verifica se já existe email cadastrado
-const existe = usuarios.find(u => u.email === usuario.email);
-if(existe){
-  alert("Este email já está cadastrado");
-  return;
-}
+  usuarios.push(usuario);
+  localStorage.setItem("usuarios", JSON.stringify(usuarios));
 
-usuarios.push(usuario);
-localStorage.setItem("usuarios", JSON.stringify(usuarios));
   alert("Cadastro realizado com sucesso! Faça login.");
   voltarLogin();
 }
 
-/* LOGIN */
+// ===== LOGIN =====
 function entrar(){
-  const email = document.getElementById("loginEmail").value;
-  const senha = document.getElementById("loginSenha").value;
+  const email = document.getElementById("loginEmail").value.trim().toLowerCase();
+  const senha = document.getElementById("loginSenha").value.trim();
 
-  const usuario = JSON.parse(localStorage.getItem("usuarioCadastrado"));
+  const usuario = usuarios.find(
+    u => u.email === email && u.senha === senha
+  );
 
-  if(!usuario || usuario.email !== email || usuario.senha !== senha){
+  if(!usuario){
     alert("Email ou senha inválidos");
     return;
   }
