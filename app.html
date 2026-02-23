@@ -225,21 +225,70 @@ function renderHome(){
 
 function renderDonations(){
   document.getElementById("menu").style.display="none";
-  document.getElementById("screen").innerHTML=
-    `<div class="card"><h3>Doações</h3><p>Consulte o histórico na Transparência.</p></div>`;
-}
 
+  document.getElementById("screen").innerHTML=`
+    <div class="card">
+      <h3>Doações</h3>
+      <p>
+        Cada doação realizada contribui diretamente para melhorar
+        as condições de vida das famílias atendidas pelo projeto.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Para onde vão os recursos</h3>
+
+      <ul class="ia-list">
+        <li>
+          <strong>🥗 Alimentação</strong><br>
+          Garante acesso a alimentos básicos e refeições dignas,
+          combatendo a insegurança alimentar e promovendo saúde
+          e bem-estar para toda a família.
+        </li>
+
+        <li>
+          <strong>💊 Remédios</strong><br>
+          Viabiliza a compra de medicamentos essenciais, assegurando
+          tratamentos contínuos e prevenindo o agravamento de
+          problemas de saúde.
+        </li>
+
+        <li>
+          <strong>🏥 Saúde</strong><br>
+          Apoia despesas com consultas, exames e cuidados médicos,
+          fortalecendo a prevenção e o cuidado integral com as famílias.
+        </li>
+
+        <li>
+          <strong>📚 Material escolar</strong><br>
+          Contribui para o acesso à educação, fornecendo materiais
+          necessários para o desenvolvimento escolar e a construção
+          de um futuro com mais oportunidades.
+        </li>
+      </ul>
+    </div>
+  `;
+}
 function renderProfile(){
   document.getElementById("menu").style.display="none";
+
+  const nomeUsuario =
+    usuario.nome ||
+    usuario.apelido ||
+    usuario.email.split("@")[0];
+
   document.getElementById("screen").innerHTML=`
     <div class="card">
       <h3>Meu Perfil</h3>
-      <p>Email: ${usuario.email}</p>
-      <p>CPF: ${cpfUsuario}</p>
-      <button class="btn gray" onclick="renderHome()">← Voltar</button>
-    </div>`;
-}
 
+      <p><strong>Nome:</strong> ${nomeUsuario}</p>
+      <p><strong>Email:</strong> ${usuario.email}</p>
+      <p><strong>CPF:</strong> ${cpfUsuario}</p>
+
+      <button class="btn gray" onclick="renderHome()">← Voltar</button>
+    </div>
+  `;
+}
 /* TRANSPARÊNCIA */
 function renderTransparency(){
   document.getElementById("menu").style.display="none";
