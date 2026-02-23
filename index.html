@@ -5,59 +5,37 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Zoê - Login</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Arsenal:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-
 <style>
-/* ===== CORREÇÃO DE ALINHAMENTO ===== */
-*{
-  box-sizing: border-box;
-}
-
+*{ box-sizing:border-box; }
 body{
   margin:0;
-  font-family:'Space Mono', monospace;
   background:#e5e7eb;
   display:flex;
   justify-content:center;
+  align-items:center;
+  min-height:100vh;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
-.phone{
+.container{
+  background:#fff;
   width:100%;
   max-width:420px;
-  min-height:100vh;
-  background:#ffffff;
   padding:24px;
+  border-radius:18px;
+  box-shadow:0 10px 30px rgba(0,0,0,.15);
 }
-h1{
+.logo{
+  display:flex;
+  justify-content:center;
+  margin-bottom:16px;
+}
+.logo img{
+  max-width:140px;
+}
+h2{
   margin-top:0;
   text-align:center;
-  font-family:'Arsenal', sans-serif;
-  font-weight:700;
-  letter-spacing:1px;
-}
-p{
-  color:#555;
-  text-align:center;
-  font-size:14px;
-  line-height:1.6;
-}
-.tabs{
-  display:flex;
-  gap:8px;
-  margin:16px 0;
-}
-.tab{
-  flex:1;
-  padding:10px;
-  border-radius:10px;
-  border:1px solid #ddd;
-  background:#eee;
-  cursor:pointer;
-  font-family:'Space Mono', monospace;
-}
-.tab.active{
-  background:#22c55e;
-  color:#fff;
-  border-color:#22c55e;
+  color:#16a34a;
 }
 input{
   width:100%;
@@ -65,170 +43,173 @@ input{
   border-radius:10px;
   border:1px solid #ddd;
   margin-bottom:10px;
-  font-family:'Space Mono', monospace;
+  font-size:14px;
 }
-input:focus{
-  outline:none;
-  border-color:#22c55e;
-}
-.btn{
+button{
   width:100%;
-  padding:14px;
+  padding:12px;
   border:none;
   border-radius:12px;
-  background:#f97316;
+  background:#22c55e;
   color:#fff;
-  font-size:16px;
+  font-weight:600;
+  font-size:15px;
   cursor:pointer;
-  font-family:'Space Mono', monospace;
-  font-weight:700;
 }
-.btn.secondary{
-  background:#e5e7eb;
-  color:#111;
-  margin-top:10px;
+.link{
+  text-align:center;
+  margin-top:12px;
+  color:#2563eb;
+  cursor:pointer;
+  font-size:14px;
 }
-.hidden{display:none}
-.back{
+.hidden{ display:none; }
+.tabs{
+  display:flex;
+  gap:8px;
+  margin-bottom:12px;
+}
+.tab{
+  flex:1;
+  text-align:center;
+  padding:10px;
+  border-radius:10px;
+  border:2px solid #22c55e;
   color:#22c55e;
   cursor:pointer;
-  margin-bottom:10px;
-  display:inline-block;
-}
-.logo{
-  width:260px;
-  max-width:90%;
-  display:block;
-  margin:20px auto;
-}
-.section-title{
-  margin:18px 0 10px;
-  font-family:'Arsenal', sans-serif;
-  font-size:18px;
-  font-weight:700;
-  color:#111;
-}
-
-/* ===== FRASE DE SEGURANÇA DESTACADA ===== */
-.secure-footer{
-  margin-top:16px;
-  padding:12px 14px;
-  background:#ecfdf5;
-  border-left:4px solid #22c55e;
-  border-radius:10px;
-  font-size:13px;
-  color:#065f46;
-  text-align:center;
-  line-height:1.5;
   font-weight:600;
+}
+.tab.active{
+  background:#22c55e;
+  color:#fff;
 }
 </style>
 </head>
 
 <body>
 
-<div class="phone">
+<div class="container">
 
-<!-- LOGIN -->
-<div id="login">
-  <h1>Olá, bem-vindo(a) ao Zoê!</h1>
+  <!-- LOGO -->
+  <div class="logo">
+    <!-- troque o src pelo caminho da sua logo -->
+    <img src="logo.png" alt="Zoê">
+  </div>
 
-  <img class="logo" src="./assets/logo.png" alt="Zoê: A vida em nós">
+  <!-- LOGIN -->
+  <div id="login">
+    <h2>Entrar</h2>
+    <input id="loginEmail" type="email" placeholder="Email">
+    <input id="loginSenha" type="password" placeholder="Senha">
+    <button onclick="entrar()">Entrar</button>
+    <div class="link" onclick="mostrarCadastro()">Criar conta</div>
+  </div>
 
-  <p>Onde a vida floresce!</p>
+  <!-- CADASTRO -->
+  <div id="cadastro" class="hidden">
+    <h2>Cadastro</h2>
 
-  <h3 style="text-align:center;font-family:'Arsenal',sans-serif;">Entrar no Zoê</h3>
-
-  <input placeholder="Email">
-  <input type="password" placeholder="Senha">
-
-  <button class="btn" onclick="entrar()">Entrar</button>
-  <button class="btn secondary" onclick="abrirCadastro()">Criar conta</button>
+    <div class="tabs">
+  <div class="tab active" onclick="selecionarTipo(this)">Família</div>
+  <div class="tab" onclick="selecionarTipo(this)">Padrinho</div>
+  <div class="tab" onclick="selecionarTipo(this)">Instituição</div>
 </div>
 
-<!-- CADASTRO -->
-<div id="cadastro" class="hidden">
-  <span class="back" onclick="voltarLogin()">← Voltar</span>
+    <!-- Dados pessoais -->
+    <input id="nome" placeholder="Nome completo">
+    <input id="rg" placeholder="RG">
+    <input id="cpf" placeholder="CPF">
+    <input id="emailCadastro" placeholder="Email">
+    <input id="telefone" placeholder="Telefone">
 
-  <h3 style="font-family:'Arsenal',sans-serif;">Criar conta</h3>
+    <!-- Dados bancários -->
+    <input id="banco" placeholder="Banco">
+    <input id="agencia" placeholder="Agência">
+    <input id="conta" placeholder="Número da conta">
+    <input id="cpfCnpjConta" placeholder="CPF/CNPJ da conta">
 
-  <div class="tabs">
-    <button class="tab active" onclick="setTab(this)">Família</button>
-    <button class="tab" onclick="setTab(this)">Padrinho</button>
-    <button class="tab" onclick="setTab(this)">Instituição</button>
-  </div>
+    <!-- Senha -->
+    <input id="senha" type="password" placeholder="Senha">
+    <input id="confirmarSenha" type="password" placeholder="Confirmar senha">
 
-  <div class="section-title">Dados pessoais</div>
-
-  <input placeholder="Nome completo">
-  <input placeholder="RG">
-  <input placeholder="CPF">
-
-  <input placeholder="Email">
-  <input placeholder="Telefone">
-
-  <div class="section-title">Dados bancários</div>
-
-  <input placeholder="Banco">
-  <input placeholder="Número da conta">
-  <input placeholder="Agência">
-  <input placeholder="CPF/CNPJ da conta">
-
-  <div class="section-title">Crie sua senha de acesso</div>
-
-  <input type="password" placeholder="Senha">
-  <input type="password" placeholder="Confirmar senha">
-
-  <button class="btn" onclick="finalizarCadastro()">Cadastrar</button>
-
-  <div class="secure-footer">
-    As informações fornecidas estão seguras e não serão compartilhadas.
-  </div>
+    <button onclick="finalizarCadastro()">Cadastrar</button>
+    <div class="link" onclick="voltarLogin()">Já tenho conta</div>
+  <div class="aviso-seguranca">
+  🔒 As informações fornecidas estão seguras e não serão compartilhadas.
 </div>
 
 </div>
 
 <script>
-function setTab(el){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
+/* TELAS */
+function mostrarCadastro(){
+  document.getElementById("login").classList.add("hidden");
+  document.getElementById("cadastro").classList.remove("hidden");
 }
-
-function abrirCadastro(){
-  document.getElementById('login').classList.add('hidden');
-  document.getElementById('cadastro').classList.remove('hidden');
-}
-
 function voltarLogin(){
-  document.getElementById('cadastro').classList.add('hidden');
-  document.getElementById('login').classList.remove('hidden');
+  document.getElementById("cadastro").classList.add("hidden");
+  document.getElementById("login").classList.remove("hidden");
 }
 
+/* TIPO CADASTRO */
+function selecionarTipo(el){
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  el.classList.add("active");
+}
+
+/* CADASTRO */
 function finalizarCadastro(){
   const tipo = document.querySelector('#cadastro .tab.active')?.innerText;
 
-  if(!tipo){
-    alert("Escolha o tipo de cadastro");
+  const senha = document.getElementById("senha").value;
+  const confirmar = document.getElementById("confirmarSenha").value;
+
+  if(senha !== confirmar){
+    alert("As senhas não conferem");
     return;
   }
 
-  localStorage.setItem("tipoCadastro", tipo);
+  const usuario = {
+    nome: document.getElementById("nome").value,
+    rg: document.getElementById("rg").value,
+    cpf: document.getElementById("cpf").value,
+    email: document.getElementById("emailCadastro").value,
+    telefone: document.getElementById("telefone").value,
 
-  alert("Cadastro realizado como " + tipo + "! Faça login.");
+    banco: document.getElementById("banco").value,
+    agencia: document.getElementById("agencia").value,
+    conta: document.getElementById("conta").value,
+    cpfCnpjConta: document.getElementById("cpfCnpjConta").value,
+
+    senha: senha,
+    tipoCadastro: tipo
+  };
+
+  if(!usuario.email || !usuario.cpf || !usuario.senha){
+    alert("Preencha Email, CPF e Senha");
+    return;
+  }
+
+  localStorage.setItem("usuarioCadastrado", JSON.stringify(usuario));
+
+  alert("Cadastro realizado com sucesso! Faça login.");
   voltarLogin();
 }
 
+/* LOGIN */
 function entrar(){
-  const email = document.querySelector('#login input[placeholder="Email"]').value;
+  const email = document.getElementById("loginEmail").value;
+  const senha = document.getElementById("loginSenha").value;
 
-  if(!email){
-    alert("Informe o email");
+  const usuario = JSON.parse(localStorage.getItem("usuarioCadastrado"));
+
+  if(!usuario || usuario.email !== email || usuario.senha !== senha){
+    alert("Email ou senha inválidos");
     return;
   }
 
-  localStorage.setItem("usuarioLogado", JSON.stringify({
-    email: email
-  }));
+  localStorage.setItem("usuarioLogado", JSON.stringify(usuario));
+  localStorage.setItem("cpfUsuario", usuario.cpf);
 
   window.location.href = "app.html";
 }
