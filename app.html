@@ -124,6 +124,20 @@ input{
   border-bottom:1px solid #eee;
 }
 .nav div:last-child{ border-bottom:none; }
+
+.ia-list{
+  list-style:none;
+  padding:0;
+  margin-top:12px;
+}
+.ia-list li{
+  background:#f0fdfa;
+  color:#065f46;
+  padding:10px 12px;
+  border-radius:10px;
+  font-size:14px;
+  margin-bottom:8px;
+}
 </style>
 </head>
 
@@ -151,7 +165,6 @@ const usuario = JSON.parse(localStorage.getItem("usuarioLogado"));
 const cpfUsuario = localStorage.getItem("cpfUsuario") || "Não informado";
 if(!usuario){ location.href="index.html"; }
 
-/* MENU */
 function toggleMenu(){
   const m=document.getElementById("menu");
   m.style.display=m.style.display==="flex"?"none":"flex";
@@ -162,31 +175,29 @@ function logout(){
 }
 
 /* FAMÍLIAS */
-const families = [
-  { name:"Família Silva", image:"assets/familia1.jpeg", goal:1800 },
-  { name:"Família Pereira", image:"assets/familia2.jpeg", goal:900 },
-  { name:"Família Rocha", image:"assets/familia3.jpeg", goal:1500 },
-  { name:"Família do Amor", image:"assets/familia4.jpeg", goal:2000 },
-  { name:"Família Santos", image:"assets/familia5.jpeg", goal:1200 },
-  { name:"Família Ferreira", image:"assets/familia6.jpeg", goal:1800 },
-  { name:"Família Nunes", image:"assets/familia7.jpeg", goal:900 },
-  { name:"Família Costa", image:"assets/familia8.jpeg", goal:1600 },
-  { name:"Família Lima", image:"assets/familia9.jpeg", goal:1400 }
+const families=[
+  {name:"Família Silva",image:"assets/familia1.jpeg",goal:1800},
+  {name:"Família Pereira",image:"assets/familia2.jpeg",goal:900},
+  {name:"Família Rocha",image:"assets/familia3.jpeg",goal:1500},
+  {name:"Família do Amor",image:"assets/familia4.jpeg",goal:2000},
+  {name:"Família Santos",image:"assets/familia5.jpeg",goal:1200},
+  {name:"Família Ferreira",image:"assets/familia6.jpeg",goal:1800},
+  {name:"Família Nunes",image:"assets/familia7.jpeg",goal:900},
+  {name:"Família Costa",image:"assets/familia8.jpeg",goal:1600},
+  {name:"Família Lima",image:"assets/familia9.jpeg",goal:1400}
 ];
 
 let relatorio = JSON.parse(localStorage.getItem("relatorio")) || [];
 let repasses  = JSON.parse(localStorage.getItem("repasses")) || [];
-
 let familiaAtual="";
 let valorSelecionado=0;
 
-/* CÁLCULOS */
+/* TELAS PRINCIPAIS */
 function totalArrecadadoPorFamilia(nome){
   return relatorio.filter(d=>d.familia===nome)
     .reduce((s,d)=>s+Number(d.valor),0);
 }
 
-/* TELAS */
 function renderHome(){
   document.getElementById("menu").style.display="none";
   document.getElementById("paymentScreen").style.display="none";
@@ -235,10 +246,28 @@ function renderProfile(){
 function renderTransparency(){
   document.getElementById("menu").style.display="none";
   document.getElementById("paymentScreen").style.display="none";
+
   document.getElementById("screen").innerHTML=`
     <div class="card">
       <h3>Transparência</h3>
       <button class="btn green" onclick="abrirSecaoRelatorio()">📊 Seção de relatório</button>
+    </div>
+
+    <div class="card">
+      <h3>Apoio da IA</h3>
+      <p>
+        Os dados apresentados nesta plataforma são organizados e analisados
+        automaticamente pelo sistema, com apoio de processos inteligentes
+        voltados à transparência e à integridade das informações.
+      </p>
+      <ul class="ia-list">
+        <li>Organização e padronização dos dados registrados</li>
+        <li>Consolidação automática das informações financeiras</li>
+        <li>Classificação e síntese dos dados por família e período</li>
+        <li>Análise comparativa entre valores arrecadados, metas e repasses</li>
+        <li>Identificação automática de possíveis inconsistências</li>
+        <li>Geração de resumo institucional para acompanhamento e auditoria</li>
+      </ul>
     </div>`;
 }
 
@@ -252,10 +281,10 @@ function abrirSecaoRelatorio(){
     </div>`;
 }
 
-/* PAGAMENTO */
+/* PAGAMENTO (PIX E CARTÃO) */
 function abrirPagamento(nome){
-  familiaAtual = nome;
-  valorSelecionado = 0;
+  familiaAtual=nome;
+  valorSelecionado=0;
 
   document.getElementById("screen").style.display="none";
   const p=document.getElementById("paymentScreen");
@@ -271,7 +300,6 @@ function abrirPagamento(nome){
     </div>`;
 }
 
-/* PIX */
 function abrirPix(){
   valorSelecionado=0;
   document.getElementById("paymentScreen").innerHTML=`
@@ -311,9 +339,8 @@ function gerarPix(){
     </div>`;
 }
 
-/* CARTÃO */
 function abrirCartao(){
-  valorSelecionado = 0;
+  valorSelecionado=0;
   document.getElementById("paymentScreen").innerHTML=`
     <div class="card">
       <h3>Pagamento com Cartão</h3>
@@ -363,7 +390,7 @@ function sucesso(){
   setTimeout(renderHome,1500);
 }
 
-/* PDF DOAÇÕES */
+/* ===== PDFs (CORRIGIDOS) ===== */
 function emitirPDF(){
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF();
@@ -378,9 +405,6 @@ function emitirPDF(){
   }else{
     relatorio.forEach(d=>{
       pdf.setFontSize(12);
-      pdf.text(`Nome: ${d.nome}`,10,y); y+=6;
-      pdf.text(`Email: ${d.email}`,10,y); y+=6;
-      pdf.text(`CPF: ${d.cpf}`,10,y); y+=6;
       pdf.text(`Família: ${d.familia}`,10,y); y+=6;
       pdf.text(`Valor: R$ ${Number(d.valor).toFixed(2)}`,10,y); y+=6;
       pdf.text(`Forma: ${d.forma}`,10,y); y+=6;
@@ -392,7 +416,6 @@ function emitirPDF(){
   pdf.save("relatorio-doacoes-zoe.pdf");
 }
 
-/* PDF REPASSES */
 function emitirPDFRepasses(){
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF();
@@ -409,7 +432,7 @@ function emitirPDFRepasses(){
       pdf.setFontSize(12);
       pdf.text(`Família: ${r.familia}`,10,y); y+=6;
       pdf.text(`Valor: R$ ${Number(r.valor).toFixed(2)}`,10,y); y+=6;
-      pdf.text(`Data/Hora: ${r.dataHora}`,10,y); y+=8;
+      pdf.text(`Data/Hora: ${r.dataHora || "-"}`,10,y); y+=8;
       if(y>270){ pdf.addPage(); y=10; }
     });
   }
