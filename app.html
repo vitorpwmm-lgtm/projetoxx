@@ -192,7 +192,7 @@ let repasses  = JSON.parse(localStorage.getItem("repasses")) || [];
 let familiaAtual="";
 let valorSelecionado=0;
 
-/* TELAS PRINCIPAIS */
+/* TELAS */
 function totalArrecadadoPorFamilia(nome){
   return relatorio.filter(d=>d.familia===nome)
     .reduce((s,d)=>s+Number(d.valor),0);
@@ -218,9 +218,7 @@ function renderHome(){
         <div class="progress">
           <div class="progress-fill" style="width:${percent}%"></div>
         </div>
-        <button class="btn" onclick="abrirPagamento('${f.name}')">
-          Apadrinhar
-        </button>
+        <button class="btn" onclick="abrirPagamento('${f.name}')">Apadrinhar</button>
       </div>`;
   });
 }
@@ -251,22 +249,41 @@ function renderTransparency(){
     <div class="card">
       <h3>Transparência</h3>
       <button class="btn green" onclick="abrirSecaoRelatorio()">📊 Seção de relatório</button>
+      <button class="btn blue" onclick="emitirPDFUsoRecursos()">📄 Emitir PDF – Uso de Recursos</button>
+<div class="card" style="margin-top:12px">
+  <h3>Impacto das Doações</h3>
+
+  <p>
+    Cada doação realizada nesta plataforma representa muito mais do que um valor financeiro.
+    Ela se transforma em alimento na mesa, dignidade, segurança e esperança para famílias
+    que enfrentam situações de vulnerabilidade social.
+  </p>
+
+  <p>
+    Os recursos arrecadados contribuem diretamente para:
+  </p>
+
+  <ul class="ia-list">
+    <li>Garantir acesso a necessidades básicas, como alimentação e itens essenciais</li>
+    <li>Reduzir situações de insegurança e instabilidade familiar</li>
+    <li>Apoiar a reconstrução da autonomia e da dignidade das famílias atendidas</li>
+    <li>Promover melhores condições de vida e bem-estar</li>
+  </ul>
+
+  <p>
+    Todo o processo é acompanhado com responsabilidade e transparência, assegurando que
+    cada contribuição gere um impacto positivo, real e mensurável na vida das famílias
+    beneficiadas.
+  </p>
+</div>
     </div>
 
     <div class="card">
       <h3>Apoio da IA</h3>
-      <p>
-        Os dados apresentados nesta plataforma são organizados e analisados
-        automaticamente pelo sistema, com apoio de processos inteligentes
-        voltados à transparência e à integridade das informações.
-      </p>
       <ul class="ia-list">
-        <li>Organização e padronização dos dados registrados</li>
-        <li>Consolidação automática das informações financeiras</li>
-        <li>Classificação e síntese dos dados por família e período</li>
-        <li>Análise comparativa entre valores arrecadados, metas e repasses</li>
-        <li>Identificação automática de possíveis inconsistências</li>
-        <li>Geração de resumo institucional para acompanhamento e auditoria</li>
+        <li>Organização e padronização dos dados</li>
+        <li>Consolidação automática das informações</li>
+        <li>Análise financeira por família</li>
       </ul>
     </div>`;
 }
@@ -281,10 +298,10 @@ function abrirSecaoRelatorio(){
     </div>`;
 }
 
-/* PAGAMENTO (PIX E CARTÃO) */
+/* PAGAMENTO */
 function abrirPagamento(nome){
-  familiaAtual=nome;
-  valorSelecionado=0;
+  familiaAtual = nome;
+  valorSelecionado = 0;
 
   document.getElementById("screen").style.display="none";
   const p=document.getElementById("paymentScreen");
@@ -310,8 +327,7 @@ function abrirPix(){
         <button onclick="setValor(50,this)">R$ 50</button>
         <button onclick="setValor(100,this)">R$ 100</button>
       </div>
-      <input id="valorInput" type="number"
-        placeholder="Outro valor"
+      <input id="valorInput" type="number" placeholder="Outro valor"
         oninput="setValor(this.value)">
       <button class="btn green" onclick="gerarPix()">Fazer pagamento</button>
     </div>`;
@@ -332,10 +348,7 @@ function gerarPix(){
     <div class="card" style="text-align:center">
       <h3>PIX</h3>
       <img src="assets/qrcode-pix.jpg" style="width:220px;margin:16px auto">
-      <button class="btn green"
-        onclick="registrarDoacao('Pix');sucesso()">
-        Já paguei
-      </button>
+      <button class="btn green" onclick="registrarDoacao('Pix');sucesso()">Já paguei</button>
     </div>`;
 }
 
@@ -390,28 +403,21 @@ function sucesso(){
   setTimeout(renderHome,1500);
 }
 
-/* ===== PDFs (CORRIGIDOS) ===== */
+/* PDFs */
 function emitirPDF(){
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF();
   let y = 10;
-
-  pdf.setFontSize(16);
   pdf.text("Relatório de Doações - Zoê",10,y);
   y+=10;
 
-  if(relatorio.length===0){
-    pdf.text("Nenhuma doação registrada.",10,y);
-  }else{
-    relatorio.forEach(d=>{
-      pdf.setFontSize(12);
-      pdf.text(`Família: ${d.familia}`,10,y); y+=6;
-      pdf.text(`Valor: R$ ${Number(d.valor).toFixed(2)}`,10,y); y+=6;
-      pdf.text(`Forma: ${d.forma}`,10,y); y+=6;
-      pdf.text(`Data: ${d.data}`,10,y); y+=8;
-      if(y>270){ pdf.addPage(); y=10; }
-    });
-  }
+  relatorio.forEach(d=>{
+    pdf.text(`Família: ${d.familia}`,10,y); y+=6;
+    pdf.text(`Valor: R$ ${Number(d.valor).toFixed(2)}`,10,y); y+=6;
+    pdf.text(`Forma: ${d.forma}`,10,y); y+=6;
+    pdf.text(`Data: ${d.data}`,10,y); y+=8;
+    if(y>270){ pdf.addPage(); y=10; }
+  });
 
   pdf.save("relatorio-doacoes-zoe.pdf");
 }
@@ -420,24 +426,79 @@ function emitirPDFRepasses(){
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF();
   let y = 10;
-
-  pdf.setFontSize(16);
   pdf.text("Relatório de Repasses - Zoê",10,y);
   y+=10;
 
-  if(repasses.length===0){
-    pdf.text("Nenhum repasse registrado.",10,y);
-  }else{
-    repasses.forEach(r=>{
-      pdf.setFontSize(12);
-      pdf.text(`Família: ${r.familia}`,10,y); y+=6;
-      pdf.text(`Valor: R$ ${Number(r.valor).toFixed(2)}`,10,y); y+=6;
-      pdf.text(`Data/Hora: ${r.dataHora || "-"}`,10,y); y+=8;
-      if(y>270){ pdf.addPage(); y=10; }
-    });
-  }
+  repasses.forEach(r=>{
+    pdf.text(`Família: ${r.familia}`,10,y); y+=6;
+    pdf.text(`Valor: R$ ${Number(r.valor).toFixed(2)}`,10,y); y+=6;
+    pdf.text(`Data: ${r.dataHora || "-"}`,10,y); y+=8;
+    if(y>270){ pdf.addPage(); y=10; }
+  });
 
   pdf.save("relatorio-repasses-zoe.pdf");
+}
+
+function emitirPDFUsoRecursos(){
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF();
+  let y = 15;
+
+  const total = relatorio.reduce((s,d)=>s + Number(d.valor || 0), 0);
+  const totalDoacoes = relatorio.length;
+  const totalFamilias = families.length;
+  const dataEmissao = new Date().toLocaleString("pt-BR");
+
+  const saude = total * 0.25;
+  const alimentacao = total * 0.25;
+  const material = total * 0.25;
+  const medicamentos = total * 0.25;
+
+  pdf.setFontSize(16);
+  pdf.text("Relatório de Uso de Recursos - Zoê", 10, y);
+  y += 10;
+
+  pdf.setFontSize(10);
+  pdf.text(`Data de emissão: ${dataEmissao}`, 10, y);
+  y += 10;
+
+  pdf.setFontSize(12);
+  pdf.text("Resumo Financeiro", 10, y);
+  y += 8;
+
+  pdf.text(`Total arrecadado: R$ ${total.toFixed(2)}`, 10, y); y+=6;
+  pdf.text(`Quantidade de doações registradas: ${totalDoacoes}`, 10, y); y+=6;
+  pdf.text(`Famílias atendidas: ${totalFamilias}`, 10, y); y+=10;
+
+  pdf.text("Distribuição dos Recursos", 10, y);
+  y += 8;
+
+  pdf.text(`• Saúde (25%): R$ ${saude.toFixed(2)}`, 10, y); y+=6;
+  pdf.text(`• Alimentação (25%): R$ ${alimentacao.toFixed(2)}`, 10, y); y+=6;
+  pdf.text(`• Material escolar (25%): R$ ${material.toFixed(2)}`, 10, y); y+=6;
+  pdf.text(`• Medicamentos (25%): R$ ${medicamentos.toFixed(2)}`, 10, y); y+=12;
+
+  pdf.text("Impacto Social e Transparência", 10, y);
+  y += 8;
+
+  pdf.text(
+`As doações arrecadadas por meio desta plataforma são direcionadas
+ao atendimento de necessidades essenciais das famílias cadastradas,
+incluindo saúde, alimentação, educação e acesso a medicamentos.
+
+Cada contribuição gera impacto direto na melhoria da qualidade de vida,
+promovendo dignidade, segurança e esperança às famílias atendidas.
+
+As informações apresentadas neste relatório são geradas automaticamente
+pelo sistema, com base nos registros de doações efetuadas na plataforma.
+O controle, a organização e a consolidação dos dados seguem critérios
+padronizados, garantindo integridade, rastreabilidade e transparência
+na utilização dos recursos.`,
+  10,
+  y
+  );
+
+  pdf.save("uso-de-recursos-zoe.pdf");
 }
 
 renderHome();
