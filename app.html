@@ -66,6 +66,7 @@ main{ padding:16px; }
 .btn.green{ background:#22c55e; }
 .btn.blue{ background:#2563eb; }
 .btn.gray{ background:#e5e7eb; color:#111; }
+
 .progress{
   background:#e5e7eb;
   height:8px;
@@ -77,6 +78,7 @@ main{ padding:16px; }
   background:#22c55e;
   height:100%;
 }
+
 .value-buttons{
   display:flex;
   gap:8px;
@@ -95,6 +97,7 @@ main{ padding:16px; }
   background:#22c55e;
   color:#fff;
 }
+
 input{
   width:100%;
   padding:10px;
@@ -102,6 +105,7 @@ input{
   border:1px solid #ddd;
   margin-top:8px;
 }
+
 .nav{
   position:absolute;
   top:60px;
@@ -143,16 +147,11 @@ input{
 </div>
 
 <script>
-// ===== LOGIN =====
 const usuario = JSON.parse(localStorage.getItem("usuarioLogado"));
-const tipoCadastro = localStorage.getItem("tipoCadastro");
 const cpfUsuario = localStorage.getItem("cpfUsuario") || "Não informado";
+if(!usuario){ location.href="index.html"; }
 
-if(!usuario){
-  location.href="index.html";
-}
-
-// ===== MENU =====
+/* MENU */
 function toggleMenu(){
   const m=document.getElementById("menu");
   m.style.display=m.style.display==="flex"?"none":"flex";
@@ -162,70 +161,63 @@ function logout(){
   location.href="index.html";
 }
 
-// ===== FAMÍLIAS =====
+/* FAMÍLIAS */
 const families = [
-  { name:"Família Silva", image:"assets/familia1.jpeg", goal:1800, raised:720 },
-  { name:"Família Pereira", image:"assets/familia2.jpeg", goal:900, raised:300 },
-  { name:"Família Rocha", image:"assets/familia3.jpeg", goal:1500, raised:0 },
-  { name:"Família do Amor", image:"assets/familia4.jpeg", goal:2000, raised:0 },
-  { name:"Família Santos", image:"assets/familia5.jpeg", goal:1200, raised:0 },
-  { name:"Família Ferreira", image:"assets/familia6.jpeg", goal:1800, raised:0 },
-  { name:"Família Nunes", image:"assets/familia7.jpeg", goal:900, raised:0 },
-  { name:"Família Costa", image:"assets/familia8.jpeg", goal:1600, raised:0 },
-  { name:"Família Lima", image:"assets/familia9.jpeg", goal:1400, raised:0 }
+  { name:"Família Silva", image:"assets/familia1.jpeg", goal:1800 },
+  { name:"Família Pereira", image:"assets/familia2.jpeg", goal:900 },
+  { name:"Família Rocha", image:"assets/familia3.jpeg", goal:1500 },
+  { name:"Família do Amor", image:"assets/familia4.jpeg", goal:2000 },
+  { name:"Família Santos", image:"assets/familia5.jpeg", goal:1200 },
+  { name:"Família Ferreira", image:"assets/familia6.jpeg", goal:1800 },
+  { name:"Família Nunes", image:"assets/familia7.jpeg", goal:900 },
+  { name:"Família Costa", image:"assets/familia8.jpeg", goal:1600 },
+  { name:"Família Lima", image:"assets/familia9.jpeg", goal:1400 }
 ];
 
-// ===== DADOS =====
 let relatorio = JSON.parse(localStorage.getItem("relatorio")) || [];
-let repasses = JSON.parse(localStorage.getItem("repasses")) || [];
+let repasses  = JSON.parse(localStorage.getItem("repasses")) || [];
 
 let familiaAtual="";
 let valorSelecionado=0;
 
-// ===== REGISTRO DE DOAÇÃO =====
-function registrarDoacao(forma){
-  relatorio.push({
-    nome: usuario.email.split("@")[0],
-    email: usuario.email,
-    cpf: cpfUsuario,
-    familia: familiaAtual,
-    valor: valorSelecionado,
-    forma,
-    data: new Date().toLocaleString("pt-BR")
-  });
-  localStorage.setItem("relatorio", JSON.stringify(relatorio));
-}
-
-// ===== CÁLCULOS =====
+/* CÁLCULOS */
 function totalArrecadadoPorFamilia(nome){
-  return relatorio.filter(d => d.familia === nome)
+  return relatorio.filter(d=>d.familia===nome)
     .reduce((s,d)=>s+Number(d.valor),0);
 }
-function totalRepassadoPorFamilia(nome){
-  return repasses.filter(r => r.familia === nome)
-    .reduce((s,r)=>s+Number(r.valor),0);
-}
 
-// ===== TELAS =====
+/* TELAS */
 function renderHome(){
   document.getElementById("menu").style.display="none";
   document.getElementById("paymentScreen").style.display="none";
   const s=document.getElementById("screen");
   s.style.display="block";
 
-  s.innerHTML=`<div class="card"><h3>Bem-vindo(a)!</h3><p>Ajude famílias através do apadrinhamento.</p></div>`;
+  s.innerHTML=`<div class="card"><h3>Bem-vindo(a)!</h3></div>`;
 
   families.forEach(f=>{
-    const percent=Math.min((f.raised/f.goal)*100,100);
+    const arrec=totalArrecadadoPorFamilia(f.name);
+    const percent=Math.min((arrec/f.goal)*100,100);
+
     s.innerHTML+=`
       <div class="card">
         <img src="${f.image}">
         <strong>${f.name}</strong>
-        <p>R$ ${f.raised} / R$ ${f.goal}</p>
-        <div class="progress"><div class="progress-fill" style="width:${percent}%"></div></div>
-        <button class="btn" onclick="abrirPagamento('${f.name}')">Apadrinhar</button>
+        <p>R$ ${arrec.toFixed(2)} / R$ ${f.goal}</p>
+        <div class="progress">
+          <div class="progress-fill" style="width:${percent}%"></div>
+        </div>
+        <button class="btn" onclick="abrirPagamento('${f.name}')">
+          Apadrinhar
+        </button>
       </div>`;
   });
+}
+
+function renderDonations(){
+  document.getElementById("menu").style.display="none";
+  document.getElementById("screen").innerHTML=
+    `<div class="card"><h3>Doações</h3><p>Consulte o histórico na Transparência.</p></div>`;
 }
 
 function renderProfile(){
@@ -239,13 +231,7 @@ function renderProfile(){
     </div>`;
 }
 
-function renderDonations(){
-  document.getElementById("menu").style.display="none";
-  document.getElementById("screen").innerHTML=
-    `<div class="card"><h3>Doações</h3><p>Histórico em breve.</p></div>`;
-}
-
-// ===== TRANSPARÊNCIA =====
+/* TRANSPARÊNCIA */
 function renderTransparency(){
   document.getElementById("menu").style.display="none";
   document.getElementById("paymentScreen").style.display="none";
@@ -253,75 +239,28 @@ function renderTransparency(){
     <div class="card">
       <h3>Transparência</h3>
       <button class="btn green" onclick="abrirSecaoRelatorio()">📊 Seção de relatório</button>
-      <button class="btn blue" onclick="emitirPDF()">📄 Emitir PDF</button>
     </div>`;
 }
 
 function abrirSecaoRelatorio(){
-  const s=document.getElementById("screen");
-  let html=`<div class="card"><h3>Relatório de Doações</h3></div>`;
-
-  if(relatorio.length===0){
-    html+=`<div class="card">Nenhuma doação registrada.</div>`;
-  }else{
-    relatorio.forEach(d=>{
-      html+=`
-        <div class="card" style="font-size:14px">
-          Nome: ${d.nome}<br>
-          Email: ${d.email}<br>
-          CPF: ${d.cpf}<br>
-          Família: ${d.familia}<br>
-          Valor: R$ ${Number(d.valor).toFixed(2)}<br>
-          Forma: ${d.forma}<br>
-          Data: ${d.data}
-        </div>`;
-    });
-  }
-
-  html+=`<div class="card"><h3>Repasse Financeiro</h3></div>`;
-
-  families.forEach(f=>{
-    const arrec=totalArrecadadoPorFamilia(f.name);
-    const rep=totalRepassadoPorFamilia(f.name);
-    const saldo=arrec-rep;
-
-    html+=`
-      <div class="card" style="font-size:14px">
-        <strong>${f.name}</strong><br>
-        Arrecadado: R$ ${arrec.toFixed(2)}<br>
-        Repassado: R$ ${rep.toFixed(2)}<br>
-        Saldo disponível: R$ ${saldo.toFixed(2)}
-      </div>`;
-  });
-
-  html+=`
-    <button class="btn green" onclick="registrarRepasseAutomatico()">Registrar repasse</button>
-    <button class="btn gray" onclick="renderTransparency()">← Voltar</button>`;
-  s.innerHTML=html;
+  document.getElementById("screen").innerHTML=`
+    <div class="card">
+      <h3>Relatórios</h3>
+      <button class="btn blue" onclick="emitirPDF()">📄 Emitir PDF de Doações</button>
+      <button class="btn green" onclick="emitirPDFRepasses()">💰 Emitir PDF de Repasses</button>
+      <button class="btn gray" onclick="renderTransparency()">← Voltar</button>
+    </div>`;
 }
 
-// ===== REPASSE =====
-function registrarRepasseAutomatico(){
-  let houve=false;
-  families.forEach(f=>{
-    const saldo=totalArrecadadoPorFamilia(f.name)-totalRepassadoPorFamilia(f.name);
-    if(saldo>0){
-      repasses.push({familia:f.name,valor:saldo,forma:"Repasse financeiro",dataHora:new Date().toLocaleString("pt-BR")});
-      houve=true;
-    }
-  });
-  if(!houve){ alert("Não há saldo disponível."); return; }
-  localStorage.setItem("repasses", JSON.stringify(repasses));
-  alert("Repasse registrado com sucesso.");
-  abrirSecaoRelatorio();
-}
-
-// ===== PAGAMENTO =====
+/* PAGAMENTO */
 function abrirPagamento(nome){
-  familiaAtual=nome;
+  familiaAtual = nome;
+  valorSelecionado = 0;
+
   document.getElementById("screen").style.display="none";
   const p=document.getElementById("paymentScreen");
   p.style.display="block";
+
   p.innerHTML=`
     <div class="card">
       <h3>Forma de pagamento</h3>
@@ -332,6 +271,7 @@ function abrirPagamento(nome){
     </div>`;
 }
 
+/* PIX */
 function abrirPix(){
   valorSelecionado=0;
   document.getElementById("paymentScreen").innerHTML=`
@@ -342,7 +282,9 @@ function abrirPix(){
         <button onclick="setValor(50,this)">R$ 50</button>
         <button onclick="setValor(100,this)">R$ 100</button>
       </div>
-      <input id="valorInput" type="number" placeholder="Outro valor" oninput="setValor(this.value)">
+      <input id="valorInput" type="number"
+        placeholder="Outro valor"
+        oninput="setValor(this.value)">
       <button class="btn green" onclick="gerarPix()">Fazer pagamento</button>
     </div>`;
 }
@@ -351,7 +293,8 @@ function setValor(v,btn=null){
   valorSelecionado=Number(v)||0;
   const i=document.getElementById("valorInput");
   if(i) i.value=valorSelecionado||"";
-  document.querySelectorAll(".value-buttons button").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".value-buttons button")
+    .forEach(b=>b.classList.remove("active"));
   if(btn) btn.classList.add("active");
 }
 
@@ -361,62 +304,119 @@ function gerarPix(){
     <div class="card" style="text-align:center">
       <h3>PIX</h3>
       <img src="assets/qrcode-pix.jpg" style="width:220px;margin:16px auto">
-      <button class="btn green" onclick="registrarDoacao('Pix'); sucesso()">Já paguei</button>
+      <button class="btn green"
+        onclick="registrarDoacao('Pix');sucesso()">
+        Já paguei
+      </button>
     </div>`;
 }
 
+/* CARTÃO */
 function abrirCartao(){
-  registrarDoacao("Cartão");
-  sucesso();
+  valorSelecionado = 0;
+  document.getElementById("paymentScreen").innerHTML=`
+    <div class="card">
+      <h3>Pagamento com Cartão</h3>
+      <input type="number" placeholder="Valor da doação (R$)"
+        oninput="valorSelecionado=this.value">
+      <input type="text" placeholder="Número do cartão">
+      <input type="text" placeholder="Nome no cartão">
+      <div style="display:flex;gap:8px">
+        <input type="text" placeholder="Validade (MM/AA)">
+        <input type="text" placeholder="CVV" maxlength="4">
+      </div>
+      <button class="btn blue" onclick="confirmarCartao()">Confirmar pagamento</button>
+      <button class="btn gray" onclick="abrirPagamento('${familiaAtual}')">← Voltar</button>
+    </div>`;
+}
+
+function confirmarCartao(){
+  if(valorSelecionado<=0){
+    alert("Informe um valor válido");
+    return;
+  }
+  document.getElementById("paymentScreen").innerHTML=
+    `<div class="card" style="text-align:center">Processando pagamento...</div>`;
+  setTimeout(()=>{
+    registrarDoacao("Cartão");
+    sucesso();
+  },1200);
+}
+
+/* REGISTRO */
+function registrarDoacao(forma){
+  relatorio.push({
+    nome: usuario.email.split("@")[0],
+    email: usuario.email,
+    cpf: cpfUsuario,
+    familia: familiaAtual,
+    valor: valorSelecionado,
+    forma,
+    data: new Date().toLocaleString("pt-BR")
+  });
+  localStorage.setItem("relatorio",JSON.stringify(relatorio));
 }
 
 function sucesso(){
-  document.getElementById("paymentScreen").innerHTML=`<div class="card" style="text-align:center">❤️ Obrigado!</div>`;
-  setTimeout(renderHome,2000);
+  document.getElementById("paymentScreen").innerHTML=
+    `<div class="card" style="text-align:center">❤️ Obrigado pela doação!</div>`;
+  setTimeout(renderHome,1500);
 }
 
-// ===== PDF =====
+/* PDF DOAÇÕES */
 function emitirPDF(){
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF();
-  let y=10;
+  let y = 10;
 
   pdf.setFontSize(16);
-  pdf.text("Relatório de Transparência - Zoê",10,y);
+  pdf.text("Relatório de Doações - Zoê",10,y);
   y+=10;
 
-  pdf.setFontSize(12);
-  pdf.text("Relatório de Doações",10,y);
-  y+=8;
+  if(relatorio.length===0){
+    pdf.text("Nenhuma doação registrada.",10,y);
+  }else{
+    relatorio.forEach(d=>{
+      pdf.setFontSize(12);
+      pdf.text(`Nome: ${d.nome}`,10,y); y+=6;
+      pdf.text(`Email: ${d.email}`,10,y); y+=6;
+      pdf.text(`CPF: ${d.cpf}`,10,y); y+=6;
+      pdf.text(`Família: ${d.familia}`,10,y); y+=6;
+      pdf.text(`Valor: R$ ${Number(d.valor).toFixed(2)}`,10,y); y+=6;
+      pdf.text(`Forma: ${d.forma}`,10,y); y+=6;
+      pdf.text(`Data: ${d.data}`,10,y); y+=8;
+      if(y>270){ pdf.addPage(); y=10; }
+    });
+  }
 
-  relatorio.forEach(d=>{
-    pdf.text(`Nome: ${d.nome}`,10,y);y+=6;
-    pdf.text(`Email: ${d.email}`,10,y);y+=6;
-    pdf.text(`CPF: ${d.cpf}`,10,y);y+=6;
-    pdf.text(`Família: ${d.familia}`,10,y);y+=6;
-    pdf.text(`Valor: R$ ${Number(d.valor).toFixed(2)}`,10,y);y+=6;
-    pdf.text(`Forma: ${d.forma}`,10,y);y+=6;
-    pdf.text(`Data: ${d.data}`,10,y);y+=8;
-    if(y>270){ pdf.addPage(); y=10; }
-  });
-
-  pdf.addPage(); y=10;
-  pdf.text("Repasse Financeiro",10,y); y+=8;
-
-  families.forEach(f=>{
-    const arrec=totalArrecadadoPorFamilia(f.name);
-    const rep=totalRepassadoPorFamilia(f.name);
-    const saldo=arrec-rep;
-    pdf.text(f.name,10,y);y+=6;
-    pdf.text(`Arrecadado: R$ ${arrec.toFixed(2)}`,10,y);y+=6;
-    pdf.text(`Repassado: R$ ${rep.toFixed(2)}`,10,y);y+=6;
-    pdf.text(`Saldo: R$ ${saldo.toFixed(2)}`,10,y);y+=8;
-  });
-
-  pdf.save("relatorio-transparencia-zoe.pdf");
+  pdf.save("relatorio-doacoes-zoe.pdf");
 }
 
-// START
+/* PDF REPASSES */
+function emitirPDFRepasses(){
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF();
+  let y = 10;
+
+  pdf.setFontSize(16);
+  pdf.text("Relatório de Repasses - Zoê",10,y);
+  y+=10;
+
+  if(repasses.length===0){
+    pdf.text("Nenhum repasse registrado.",10,y);
+  }else{
+    repasses.forEach(r=>{
+      pdf.setFontSize(12);
+      pdf.text(`Família: ${r.familia}`,10,y); y+=6;
+      pdf.text(`Valor: R$ ${Number(r.valor).toFixed(2)}`,10,y); y+=6;
+      pdf.text(`Data/Hora: ${r.dataHora}`,10,y); y+=8;
+      if(y>270){ pdf.addPage(); y=10; }
+    });
+  }
+
+  pdf.save("relatorio-repasses-zoe.pdf");
+}
+
 renderHome();
 </script>
 
