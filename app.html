@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zoê</title>
+<title>ZOÉ</title>
 
 <style>
 *{ box-sizing:border-box; }
@@ -145,7 +145,7 @@ input{
 <div class="phone">
 
 <header>
-  <span>Zoê</span>
+  <span>ZOÉ</span>
   <button onclick="toggleMenu()">☰</button>
 </header>
 
@@ -272,7 +272,12 @@ function renderDonations(){
           Contribui para o acesso à educação, fornecendo materiais
           necessários para o desenvolvimento escolar e a construção
           de um futuro com mais oportunidades.
-        </li>
+  <li>
+  <strong>👕 Vestimentas</strong><br>
+  Permite a aquisição de roupas e calçados adequados,
+  promovendo proteção, conforto e dignidade às famílias
+  atendidas em situação de vulnerabilidade.
+</li>
       </ul>
     </div>
   `;
@@ -475,7 +480,7 @@ function emitirPDF(){
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF();
   let y = 10;
-  pdf.text("Relatório de Doações - Zoê",10,y);
+  pdf.text("Relatório de Doações - ZOÉ",10,y);
   y+=10;
 
   relatorio.forEach(d=>{
@@ -493,7 +498,7 @@ function emitirPDFRepasses(){
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF();
   let y = 10;
-  pdf.text("Relatório de Repasses - Zoê",10,y);
+  pdf.text("Relatório de Repasses - ZOÉ",10,y);
   y+=10;
 
   repasses.forEach(r=>{
@@ -522,7 +527,7 @@ function emitirPDFUsoRecursos(){
   const medicamentos = total * 0.25;
 
   pdf.setFontSize(16);
-  pdf.text("Relatório de Uso de Recursos - Zoê", 10, y);
+  pdf.text("Relatório de Uso de Recursos - ZOÉ", 10, y);
   y += 10;
 
   pdf.setFontSize(10);
