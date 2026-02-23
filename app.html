@@ -204,7 +204,15 @@ function renderHome(){
   const s=document.getElementById("screen");
   s.style.display="block";
 
-  s.innerHTML=`<div class="card"><h3>Bem-vindo(a)!</h3></div>`;
+  s.innerHTML = `
+  <div class="card">
+    <h3>Bem-vindo(a)!</h3>
+    <p>
+      Sua presença aqui faz a diferença. Juntos, estamos transformando
+      solidariedade em impacto real na vida de famílias que precisam de apoio.
+    </p>
+  </div>
+`;
 
   families.forEach(f=>{
     const arrec=totalArrecadadoPorFamilia(f.name);
